@@ -2,10 +2,14 @@ model:
   base_learning_rate: 6.0e-06 # 1.5e-04
   scale_lr: False
   # empty_params_only: True # disable this means finetuning all parameters
-  target: src.base.ddpm3d.LVDMFlow
+  target: src.lvdm.models.ddpm3d.LatentDiffusion
   params:
     loss_type: l1
     log_every_t: 200
+    linear_start: 0.00085
+    linear_end: 0.012
+    num_timesteps_cond: 1
+    timesteps: 1000
     first_stage_key: video
     cond_stage_key: caption
     cond_stage_trainable: false
@@ -22,13 +26,6 @@ model:
     encoder_type: 2d
     use_scale: true
     scale_b: 0.7 # adapt to videocrafter-v2
-
-    diffusion_scheduler_config:
-      target: src.base.diffusion_schedulers.LDMScheduler
-      params: 
-        timesteps: 1000
-        linear_start: 0.00085
-        linear_end: 0.012
 
     unet_config:
       target: src.lvdm.modules.networks.openaimodel3d.UNetModel
@@ -60,7 +57,7 @@ model:
         addition_attention: true
         fps_cond: true # adapt to videocrafter-v2
     first_stage_config:
-      target: src.lvdm.modules.vae.autoencoder.AutoencoderKL
+      target: src.lvdm.models.autoencoder.AutoencoderKL
       params:
         embed_dim: 4
         monitor: val/rec_loss
@@ -88,20 +85,20 @@ model:
         layer: penultimate
 
 data:
-  target: src.data.lightning_data.DataModuleFromConfig
+  target: data.lightning_data.DataModuleFromConfig
   params:
     batch_size: 3
     num_workers: 16
     wrap: false
     train:
-      target: src.data.macvid.MaCVid
+      target: data.macvid.MaCVid
       params:
         data_root: configs/data/macvid/train_data.yaml
         resolution: [320, 512]
         video_length: 16
         subset_split: all
     validation:
-      target: src.data.macvid.MaCVid
+      target: data.macvid.MaCVid
       params:
         data_root: configs/data/macvid/val_data.yaml
         resolution: [320, 512]
@@ -111,14 +108,15 @@ data:
 lightning:
   trainer:
     benchmark: True
+    batch_size: 3
+    num_workers: 38
     num_nodes: 1
-    devices: 0
     accumulate_grad_batches: 2
     max_epochs: 2000
     precision: 16 # training precision
   callbacks:
     image_logger:
-      target: src.utils.callbacks.ImageLogger
+      target: utils.callbacks.ImageLogger
       params:
         batch_frequency: 2
         max_images: 6
