@@ -248,7 +248,7 @@ The 3D video VAE from VideoTuna can accurately compress and reconstruct the inpu
 ### Code Structure
 ```
 VideoTuna/
-    ├── assets
+    ├── assets       # put images for readme
     ├── checkpoints  # put model checkpoints here
     ├── configs      # model and experimental configs
     ├── data         # data processing scripts and dataset files
