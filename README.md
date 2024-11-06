@@ -329,10 +329,11 @@ After downloading, the model checkpoints should be placed as [Checkpoint Structu
 
 ### 3.Inference state-of-the-art T2V/I2V/T2I models
 
-- Inference many video generation models **in one command**: `bash tools/video_comparison/compare.sh`
-- The default mode is to run all models, e.g., `inference_methods="videocrafter2;dynamicrafter;cogvideo—t2v;cogvideo—i2v;opensora"`
-- If the users want to inference specific models, modify the `inference_methods` variable in `compare.sh`, and list the desired models separated by semicolons.
-- Also specify the input directory via the `input_dir` variable. This directory should contain a `prompts.txt` file, where each line corresponds to a prompt for the video generation. The default `input_dir` is `inputs/t2v`
+- Inference a set of text-to-video models **in one command**: `bash tools/video_comparison/compare.sh`
+  - The default mode is to run all models, e.g., `inference_methods="videocrafter2;dynamicrafter;cogvideo—t2v;cogvideo—i2v;opensora"`
+  - If the users want to inference specific models, modify the `inference_methods` variable in `compare.sh`, and list the desired models separated by semicolons.
+  - Also specify the input directory via the `input_dir` variable. This directory should contain a `prompts.txt` file, where each line corresponds to a prompt for the video generation. The default `input_dir` is `inputs/t2v`
+- Inference a set of image-to-video models **in one command**: `bash tools/video_comparison/compare_i2v.sh`
 
 
 
@@ -344,7 +345,7 @@ After downloading, the model checkpoints should be placed as [Checkpoint Structu
  -->
 
 
-- Inference one specific model:
+- Inference a specific model, run the corresponding commands as follows:
 
 Task|Models|Commands|
 |:---------|:---------|:---------|
