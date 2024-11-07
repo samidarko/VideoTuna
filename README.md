@@ -48,6 +48,14 @@ The 3D video VAE from VideoTuna can accurately compress and reconstruct the inpu
 
 <table class="center">
   <tr>
+    <td><a href="https://github.com/user-attachments/assets/0efcbf80-0074-4421-810f-79a1f1733ed3"><img src="https://github.com/user-attachments/assets/0efcbf80-0074-4421-810f-79a1f1733ed3" width="320"></a></td>
+    <td><a href="https://github.com/user-attachments/assets/4adf29f2-d413-49b1-bccc-48adfd64a4da"><img src="https://github.com/user-attachments/assets/4adf29f2-d413-49b1-bccc-48adfd64a4da" width="320"></a></td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/user-attachments/assets/508e2b10-487a-4850-a9d8-89fdbc13120a"><img src="https://github.com/user-attachments/assets/508e2b10-487a-4850-a9d8-89fdbc13120a" width="320"></a></td>
+    <td><a href="https://github.com/user-attachments/assets/28029b2c-4922-46ee-88d3-ff8d577d2525"><img src="https://github.com/user-attachments/assets/28029b2c-4922-46ee-88d3-ff8d577d2525)" width="320"></a></td>
+  </tr>
+  <tr>
     <td><a href="https://github.com/user-attachments/assets/51471c42-8a38-4f02-b29b-e34a5279753a"><img src="https://github.com/user-attachments/assets/51471c42-8a38-4f02-b29b-e34a5279753a" width="320"></a></td>
     <td><a href="https://github.com/user-attachments/assets/383f2120-5fed-4d9f-82d8-3de130d6bd65"><img src="https://github.com/user-attachments/assets/383f2120-5fed-4d9f-82d8-3de130d6bd65" width="320"></a></td>
   </tr>
