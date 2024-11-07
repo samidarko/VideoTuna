@@ -47,26 +47,34 @@
 The 3D video VAE from VideoTuna can accurately compress and reconstruct the input videos with fine details.
 
 <table class="center">
+  
+  <tr>
+    <td style="text-align:center;" width="320">Ground Truth</td>
+    <td style="text-align:center;" width="320">Reconstruction</td>
+  </tr>
   <tr>
     <td><a href="https://github.com/user-attachments/assets/0efcbf80-0074-4421-810f-79a1f1733ed3"><img src="https://github.com/user-attachments/assets/0efcbf80-0074-4421-810f-79a1f1733ed3" width="320"></a></td>
     <td><a href="https://github.com/user-attachments/assets/4adf29f2-d413-49b1-bccc-48adfd64a4da"><img src="https://github.com/user-attachments/assets/4adf29f2-d413-49b1-bccc-48adfd64a4da" width="320"></a></td>
+  </tr>
+
+  <tr>
+    <td style="text-align:center;" width="320">Ground Truth</td>
+    <td style="text-align:center;" width="320">Reconstruction</td>
   </tr>
   <tr>
     <td><a href="https://github.com/user-attachments/assets/508e2b10-487a-4850-a9d8-89fdbc13120a"><img src="https://github.com/user-attachments/assets/508e2b10-487a-4850-a9d8-89fdbc13120a" width="320"></a></td>
     <td><a href="https://github.com/user-attachments/assets/28029b2c-4922-46ee-88d3-ff8d577d2525"><img src="https://github.com/user-attachments/assets/28029b2c-4922-46ee-88d3-ff8d577d2525)" width="320"></a></td>
   </tr>
+
+  <tr>
+    <td style="text-align:center;" width="320">Ground Truth</td>
+    <td style="text-align:center;" width="320">Reconstruction</td>
+  </tr>
   <tr>
     <td><a href="https://github.com/user-attachments/assets/51471c42-8a38-4f02-b29b-e34a5279753a"><img src="https://github.com/user-attachments/assets/51471c42-8a38-4f02-b29b-e34a5279753a" width="320"></a></td>
     <td><a href="https://github.com/user-attachments/assets/383f2120-5fed-4d9f-82d8-3de130d6bd65"><img src="https://github.com/user-attachments/assets/383f2120-5fed-4d9f-82d8-3de130d6bd65" width="320"></a></td>
   </tr>
-  <tr>
-    <td style="text-align:center;" width="320">Groud Truth</td>
-    <td style="text-align:center;" width="320">Reconstruction</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/user-attachments/assets/e7a105df-5667-405c-b236-10407fe927f4"><img src="https://github.com/user-attachments/assets/e7a105df-5667-405c-b236-10407fe927f4" width="320"></a></td>
-    <td><a href="https://github.com/user-attachments/assets/b55dc172-129d-463e-b565-64fb4e00e493"><img src="https://github.com/user-attachments/assets/b55dc172-129d-463e-b565-64fb4e00e493" width="320"></a></td>
-  </tr>
+
   <tr>
     <td style="text-align:center;" width="320">Ground Truth</td>
     <td style="text-align:center;" width="320">Reconstruction</td>
@@ -75,15 +83,16 @@ The 3D video VAE from VideoTuna can accurately compress and reconstruct the inpu
     <td><a href="https://github.com/user-attachments/assets/28892f4c-54cc-4cea-91e1-8fe6bbc7a1a4"><img src="https://github.com/user-attachments/assets/28892f4c-54cc-4cea-91e1-8fe6bbc7a1a4" width="320"></a></td>
     <td><a href="https://github.com/user-attachments/assets/d56d34e4-c4d5-4ed2-b2c5-fa1596714492"><img src="https://github.com/user-attachments/assets/d56d34e4-c4d5-4ed2-b2c5-fa1596714492" width="320"></a></td>
   </tr>
+  
   <tr>
     <td style="text-align:center;" width="320">Ground Truth</td>
     <td style="text-align:center;" width="320">Reconstruction</td>
   </tr>
-
   <tr>
     <td><a href="https://github.com/user-attachments/assets/a0ffc2ca-c3e2-485f-b0ea-ead0d733cc8b"><img src="https://github.com/user-attachments/assets/a0ffc2ca-c3e2-485f-b0ea-ead0d733cc8b" width="320"></a></td>
     <td><a href="https://github.com/user-attachments/assets/1465ac70-caa9-42c7-874b-b01e13a78efb"><img src="https://github.com/user-attachments/assets/1465ac70-caa9-42c7-874b-b01e13a78efb" width="320"></a></td>
   </tr>
+  
   <tr>
     <td style="text-align:center;" width="320">Ground Truth</td>
     <td style="text-align:center;" width="320">Reconstruction</td>
@@ -92,6 +101,7 @@ The 3D video VAE from VideoTuna can accurately compress and reconstruct the inpu
     <td><a href="https://github.com/user-attachments/assets/48e2eb49-265b-4eaf-b730-48fa4d7e5bfd"><img src="https://github.com/user-attachments/assets/48e2eb49-265b-4eaf-b730-48fa4d7e5bfd" width="320"></a></td>
     <td><a href="https://github.com/user-attachments/assets/24c893c5-865e-4af4-b003-17bda2ba4f59"><img src="https://github.com/user-attachments/assets/24c893c5-865e-4af4-b003-17bda2ba4f59" width="320"></a></td>
   </tr>
+  
   <tr>
     <td style="text-align:center;" width="320">Ground Truth</td>
     <td style="text-align:center;" width="320">Reconstruction</td>
@@ -100,10 +110,8 @@ The 3D video VAE from VideoTuna can accurately compress and reconstruct the inpu
     <td><a href="https://github.com/user-attachments/assets/c18ed80f-3650-43a7-8438-7914de7e39ab"><img src="https://github.com/user-attachments/assets/c18ed80f-3650-43a7-8438-7914de7e39ab" width="320"></a></td>
     <td><a href="https://github.com/user-attachments/assets/89d38004-021b-4a4d-ab83-5627474f8928"><img src="https://github.com/user-attachments/assets/89d38004-021b-4a4d-ab83-5627474f8928" width="320"></a></td>
   </tr>
-  <tr>
-    <td style="text-align:center;" width="320">Ground Truth</td>
-    <td style="text-align:center;" width="320">Reconstruction</td>
-  </tr>
+  
+  
 </table>
 
 ### Face domain
