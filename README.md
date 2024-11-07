@@ -4,8 +4,7 @@
 
 # VideoTuna
 
-![Version](https://img.shields.io/badge/version-0.1.0-blue) ![visitors](https://visitor-badge.laobi.icu/badge?page_id=VideoVerses.VideoTuna&left_color=green&right_color=red) [![GitHub](https://img.shields.io/github/stars/VideoVerses/VideoTuna?style=social)](https://github.com/VideoVerses/VideoTuna) [![](https://dcbadge.limes.pink/api/server/AammaaR2?style=flat)](https://discord.gg/AammaaR2) <a href='assets/wechat_group.jpg'><img src='https://badges.aleen42.com/src/wechat.svg'></a>
-
+![Version](https://img.shields.io/badge/version-0.1.0-blue) ![visitors](https://visitor-badge.laobi.icu/badge?page_id=VideoVerses.VideoTuna&left_color=green&right_color=red) [![GitHub](https://img.shields.io/github/stars/VideoVerses/VideoTuna?style=social)](https://github.com/VideoVerses/VideoTuna) [![](https://dcbadge.limes.pink/api/server/AammaaR2?style=flat)](https://discord.gg/AammaaR2) <a href='https://github.com/user-attachments/assets/ae3cd561-8042-44c7-8506-27d8077975d8'><img src='https://badges.aleen42.com/src/wechat.svg'></a>
 
 
 🤗🤗🤗 Videotuna is a useful codebase for text-to-video applications.   
