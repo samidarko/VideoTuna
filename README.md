@@ -56,16 +56,16 @@ The 3D video VAE from VideoTuna can accurately compress and reconstruct the inpu
     <td style="text-align:center;" width="320">Reconstruction</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/VideoVerses/VideoTuna/blob/main/assets/demos/vae/gtview9.gif"><img src="assets/demos/vae/fkview9.gif" width="320"></a></td>
-    <td><a href="https://github.com/VideoVerses/VideoTuna/blob/main/assets/demos/vae/fkview9.gif"><img src="assets/demos/vae/fkview9.gif" width="320"></a></td>
+    <td><a href="https://github.com/user-attachments/assets/e7a105df-5667-405c-b236-10407fe927f4"><img src="https://github.com/user-attachments/assets/e7a105df-5667-405c-b236-10407fe927f4" width="320"></a></td>
+    <td><a href="https://github.com/user-attachments/assets/b55dc172-129d-463e-b565-64fb4e00e493"><img src="https://github.com/user-attachments/assets/b55dc172-129d-463e-b565-64fb4e00e493" width="320"></a></td>
   </tr>
   <tr>
     <td style="text-align:center;" width="320">Ground Truth</td>
     <td style="text-align:center;" width="320">Reconstruction</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/VideoVerses/VideoTuna/blob/main/assets/demos/vae/gtface.gif"><img src="assets/demos/vae/gtface.gif" width="320"></a></td>
-    <td><a href="https://github.com/VideoVerses/VideoTuna/blob/main/assets/demos/vae/fkface.gif"><img src="assets/demos/vae/fkface.gif" width="320"></a></td>
+    <td><a href="https://github.com/user-attachments/assets/28892f4c-54cc-4cea-91e1-8fe6bbc7a1a4"><img src="https://github.com/user-attachments/assets/28892f4c-54cc-4cea-91e1-8fe6bbc7a1a4" width="320"></a></td>
+    <td><a href="https://github.com/user-attachments/assets/d56d34e4-c4d5-4ed2-b2c5-fa1596714492"><img src="https://github.com/user-attachments/assets/d56d34e4-c4d5-4ed2-b2c5-fa1596714492" width="320"></a></td>
   </tr>
   <tr>
     <td style="text-align:center;" width="320">Ground Truth</td>
