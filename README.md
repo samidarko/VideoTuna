@@ -431,7 +431,7 @@ We thank the following repos for sharing their awesome models and codes!
 
 ## Some Resources
 * [LLMs-Meet-MM-Generation](https://github.com/YingqingHe/Awesome-LLMs-meet-Multimodal-Generation): A paper collection of utilizing LLMs for multimodal generation (image, video, 3D and audio).
-* [MMTrail](https://mattie-e.github.io/MMTrail/): A multimodal trailer video dataset with language and music descriptions.
+* [MMTrail](https://github.com/litwellchi/MMTrail): A multimodal trailer video dataset with language and music descriptions.
 * [Seeing-and-Hearing](https://github.com/yzxing87/Seeing-and-Hearing): A versatile framework for Joint VA generation, V2A, A2V, and I2A.
 * [Self-Cascade](https://github.com/GuoLanqing/Self-Cascade): A Self-Cascade model for higher-resolution image and video generation.
 * [ScaleCrafter](https://github.com/YingqingHe/ScaleCrafter) and [HiPrompt](https://liuxinyv.github.io/HiPrompt/): Free method for higher-resolution image and video generation.
