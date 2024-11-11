@@ -11,6 +11,7 @@ mkdir checkpoints
 # ---------------------------- T2V ----------------------------
 
 # ---- CogVideo (diffusers) ----
+mkdir checkpoints/cogvideo
 cd checkpoints/cogvideo
 git clone https://huggingface.co/THUDM/CogVideoX-2b
 git clone https://huggingface.co/THUDM/CogVideoX-5b
