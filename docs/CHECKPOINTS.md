@@ -13,10 +13,10 @@ mkdir checkpoints
 # ---- CogVideo (diffusers) ----
 mkdir checkpoints/cogvideo
 cd checkpoints/cogvideo
-git clone https://huggingface.co/THUDM/CogVideoX-2b
-git clone https://huggingface.co/THUDM/CogVideoX-5b
-git clone https://huggingface.co/THUDM/CogVideoX-5b-I2V
-
+git clone https://huggingface.co/THUDM/CogVideoX-2b         # This are checkpoints for CogVideoX T2V-2B
+git clone https://huggingface.co/THUDM/CogVideoX-5b         # This are checkpoints for CogVideoX T2V-5B
+git clone https://huggingface.co/THUDM/CogVideoX-5b-I2V     # This are checkpoints for CogVideoX I2V-5B
+git clone https://huggingface.co/THUDM/CogVideoX1.5-5B-SAT  # This are checkpoints for CogVideoX 1.5-5B (both T2V and I2V)
 
 # ---- Open-Sora ----
 mkdir -p checkpoints/open-sora/t2v_v10
@@ -65,7 +65,17 @@ mkdir checkpoints/stablediffusion/v2-1_512-ema
 
 wget https://huggingface.co/stabilityai/stable-diffusion-2-1-base/blob/main/v2-1_512-ema-pruned.ckpt -P checkpoints/stablediffusion/v2-1_512-ema
 
+
+# ---------------------------- V2V ----------------------------
+# ---- ModelScope Video-to-Video ----
+cd checkpoints
+# please ensure that you have installed lfs. If not, you can install it by running the following command:
+git lfs install
+# after installing lfs, you can clone the Video-to-Video checkpoints
+git clone https://www.modelscope.cn/iic/Video-to-Video.git
+
 ```
+
 
 ### Checkpoint Orgnization Structure
 After downloading, the model checkpoints should be placed as follows:  

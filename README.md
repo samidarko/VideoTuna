@@ -323,10 +323,6 @@ Please check [docs/CHECKPOINTS.md](docs/CHECKPOINTS.md) to download all the mode
 ``` shell
 conda create --name videotuna python=3.10 -y
 conda activate videotuna
-pip install -U poetry pip
-poetry config virtualenvs.create false
-poetry install
-pip install optimum-quanto==0.2.1
 pip install -r requirements.txt
 git clone https://github.com/JingyeChen/SwissArmyTransformer
 pip install -e SwissArmyTransformer/
@@ -335,6 +331,8 @@ git clone https://github.com/tgxs002/HPSv2.git
 cd ./HPSv2
 pip install -e .
 cd ..
+conda config --add channels conda-forge
+conda install ffmpeg
 ```
 
 ### 2.Prepare checkpoints
