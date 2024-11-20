@@ -1,0 +1,14 @@
+args:
+  image2video: True  # True for image2video, False for text2video
+  latent_channels: 16
+  mode: inference
+  load: "checkpoints/cogvideo/CogVideoX-5B-I2V/transformer" # This is for Full model without lora adapter
+  batch_size: 1
+  input_type: txt
+  input_file: configs/004_cogvideox/prompt.txt
+  # sampling_image_size: [768, 1360] # remove this for I2V
+  sampling_num_frames: 13  # For CogVideoX-5B / 2B, it must be 13, 11, or 9.
+  sampling_fps: 16
+  bf16: True
+  output_dir: outputs/
+  force_inference: True

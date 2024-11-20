@@ -10,13 +10,47 @@ mkdir checkpoints
 
 # ---------------------------- T2V ----------------------------
 
-# ---- CogVideo (diffusers) ----
-mkdir checkpoints/cogvideo
+# ---- CogVideo ----
+mkdir -p checkpoints/cogvideo
 cd checkpoints/cogvideo
 git clone https://huggingface.co/THUDM/CogVideoX-2b
 git clone https://huggingface.co/THUDM/CogVideoX-5b
-git clone https://huggingface.co/THUDM/CogVideoX-5b-I2V
-
+mkdir t5-v1_1-xxl
+mv CogVideoX-2b/text_encoder/* CogVideoX-2b/tokenizer/* t5-v1_1-xxl
+mkdir  CogVideoX1.5-5B-SAT
+python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='THUDM/CogVideoX1.5-5B-SAT', ignore_patterns=['t5*'], local_dir='CogVideoX1.5-5B-SAT')"
+# VAE for CogVideoX-2B, 5B, 5B-I2V
+wget https://cloud.tsinghua.edu.cn/f/fdba7608a49c463ba754/?dl=1
+mv 'index.html?dl=1' vaesat.zip
+unzip vaesat.zip -d vaesat
+rm -rf vaesat.zip
+mkdir CogVideoX-2b-sat
+cd CogVideoX-2b-sat
+wget https://cloud.tsinghua.edu.cn/f/556a3e1329e74f1bac45/?dl=1
+mv 'index.html?dl=1' transformer.zip
+unzip transformer.zip
+rm -rf transformer.zip
+cd ..
+mkdir CogVideoX-5b-sat
+cd CogVideoX-5b-sat
+wget "https://cloud.tsinghua.edu.cn/d/fcef5b3904294a6885e5/files/?p=%2F1%2FCogVideoX-5B-transformer.tar.gz&dl=1"
+mv 'index.html?p=%2F1%2FCogVideoX-5B-transformer.tar.gz&dl=1' transformer.tar.gz
+tar -xzvf transformer.tar.gz
+mv 'CogVideoX-5B-transformer' transformer
+rm transformer.tar.gz
+wget "https://cloud.tsinghua.edu.cn/d/fcef5b3904294a6885e5/files/?p=%2Flatest&dl=1"
+mv 'index.html?p=%2Flatest&dl=1' latest
+cd ..
+mkdir CogVideoX-5B-I2V
+cd CogVideoX-5B-I2V
+wget "https://cloud.tsinghua.edu.cn/d/5cc62a2d6e7d45c0a2f6/files/?p=%2F1%2Fmp_rank_00_model_states.zip&dl=1"
+mkdir -p transformer/1
+mv "index.html?p=%2F1%2Fmp_rank_00_model_states.zip&dl=1" "transformer/1/transformer.zip"
+unzip "transformer/1/transformer.zip" -d "transformer/1/"
+rm -rf transformer/1/transformer.zip
+wget "https://cloud.tsinghua.edu.cn/d/fcef5b3904294a6885e5/files/?p=%2Flatest&dl=1"
+mv 'index.html?p=%2Flatest&dl=1' "transformer/latest"
+cd ..
 
 # ---- Open-Sora ----
 mkdir -p checkpoints/open-sora/t2v_v10
