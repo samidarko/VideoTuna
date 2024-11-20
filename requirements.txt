@@ -36,7 +36,7 @@ beartype==0.18.5
 numpy==1.*
 https://github.com/Dao-AILab/flash-attention/releases/download/v2.6.3/flash_attn-2.6.3+cu123torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
 git+https://github.com/huggingface/diffusers
-apex
 open_clip_torch==2.12.0
 lmdeploy
 moviepy
+SwissArmyTransformer==0.4.12

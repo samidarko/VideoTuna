@@ -1,0 +1,1 @@
+A boy is running.@@/project/llmsvgen/juno/VideoTuna/configs/005_cogvideox1.5/boy.jpg
