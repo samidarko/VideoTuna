@@ -10,175 +10,47 @@ from sat import mpu
 from sat.arguments import set_random_seed
 from sat.arguments import add_training_args, add_evaluation_args, add_data_args
 import torch.distributed
+import deepspeed
 
+import sys
 
-def add_model_config_args(parser):
-    """Model arguments"""
-
-    group = parser.add_argument_group("model", "model configuration")
-    group.add_argument("--base", type=str, nargs="*", help="config for input and saving")
-    group.add_argument(
-        "--model-parallel-size", type=int, default=1, help="size of the model parallel. only use if you are an expert."
-    )
-    group.add_argument("--force-pretrain", action="store_true")
-    group.add_argument("--device", type=int, default=-1)
-    group.add_argument("--debug", action="store_true")
-    group.add_argument("--log-image", type=bool, default=True)
-
-    return parser
+sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
 
 def add_sampling_config_args(parser):
     """Sampling configurations"""
-
     group = parser.add_argument_group("sampling", "Sampling Configurations")
-    group.add_argument("--output-dir", type=str, default="samples")
     group.add_argument("--input-dir", type=str, default=None)
-    group.add_argument("--input-type", type=str, default="cli")
-    group.add_argument("--input-file", type=str, default="input.txt")
     group.add_argument("--sampling-image-size", type=list, default=[768, 1360])
     group.add_argument("--final-size", type=int, default=2048)
     group.add_argument("--sdedit", action="store_true")
     group.add_argument("--grid-num-rows", type=int, default=1)
     group.add_argument("--force-inference", action="store_true")
     group.add_argument("--lcm_steps", type=int, default=None)
-    group.add_argument("--sampling-num-frames", type=int, default=32)
-    group.add_argument("--sampling-fps", type=int, default=8)
+    group.add_argument("--sampling-num-frames", type=int, default=22)
+    group.add_argument("--sampling-fps", type=int, default=16)
     group.add_argument("--only-save-latents", type=bool, default=False)
     group.add_argument("--only-log-video-latents", type=bool, default=False)
-    group.add_argument("--latent-channels", type=int, default=32)
+    group.add_argument("--latent-channels", type=int, default=16)
     group.add_argument("--image2video", action="store_true")
+    group.add_argument("--modeForScript", type=str, default="inference")
+    group.add_argument("--batch_size", type=int, default=1)
 
     return parser
 
+def add_model_config_args(parser):
+    """Model arguments"""
+    group = parser.add_argument_group("model", "model configuration")
+    # group.add_argument("--base", type=str, nargs="*", help="config for input and saving", default="configs/005_cogvideox1.5/cogvideox1.5_5b_t2v.yaml")
+    group.add_argument(
+        "--model-parallel-size", type=int, default=1, help="size of the model parallel. only use if you are an expert."
+    )
+    group.add_argument("--force-pretrain", action="store_true", default=True)
+    group.add_argument("--device", type=int, default=-1)
+    group.add_argument("--debug", action="store_true")
+    group.add_argument("--log-image", type=bool, default=True)
 
-def get_args(args_list=None, parser=None):
-    """Parse all the args."""
-    if parser is None:
-        parser = argparse.ArgumentParser(description="sat")
-    else:
-        assert isinstance(parser, argparse.ArgumentParser)
-    parser = add_model_config_args(parser)
-    parser = add_sampling_config_args(parser)
-    parser = add_training_args(parser)
-    parser = add_evaluation_args(parser)
-    parser = add_data_args(parser)
-
-    import deepspeed
-
-    parser = deepspeed.add_config_arguments(parser)
-
-
-    args = parser.parse_args(args_list)
-    args = process_config_to_args(args)
-
-
-    if not args.train_data:
-        print_rank0("No training data specified", level="WARNING")
-
-    assert (args.train_iters is None) or (args.epochs is None), "only one of train_iters and epochs should be set."
-    if args.train_iters is None and args.epochs is None:
-        args.train_iters = 10000  # default 10k iters
-        print_rank0("No train_iters (recommended) or epochs specified, use default 10k iters.", level="WARNING")
-
-    args.cuda = torch.cuda.is_available()
-
-    args.rank = int(os.getenv("RANK", "0"))
-    args.world_size = int(os.getenv("WORLD_SIZE", "1"))
-    if args.local_rank is None:
-        args.local_rank = int(os.getenv("LOCAL_RANK", "0"))  # torchrun
-
-    if args.device == -1:
-        if torch.cuda.device_count() == 0:
-            args.device = "cpu"
-        elif args.local_rank is not None:
-            args.device = args.local_rank
-        else:
-            args.device = args.rank % torch.cuda.device_count()
-
-    if args.local_rank != args.device and args.mode != "inference":
-        raise ValueError(
-            "LOCAL_RANK (default 0) and args.device inconsistent. "
-            "This can only happens in inference mode. "
-            "Please use CUDA_VISIBLE_DEVICES=x for single-GPU training. "
-        )
-
-    if args.rank == 0:
-        print_rank0("using world size: {}".format(args.world_size))
-
-    if args.train_data_weights is not None:
-        assert len(args.train_data_weights) == len(args.train_data)
-
-    if args.mode != "inference":  # training with deepspeed
-        args.deepspeed = True
-        if args.deepspeed_config is None:  # not specified
-            deepspeed_config_path = os.path.join(
-                os.path.dirname(__file__), "training", f"deepspeed_zero{args.zero_stage}.json"
-            )
-            with open(deepspeed_config_path) as file:
-                print(f"path: {deepspeed_config_path}")
-                args.deepspeed_config = json.load(file)
-            override_deepspeed_config = True
-        else:
-            override_deepspeed_config = False
-
-    assert not (args.fp16 and args.bf16), "cannot specify both fp16 and bf16."
-
-    if args.zero_stage > 0 and not args.fp16 and not args.bf16:
-        print_rank0("Automatically set fp16=True to use ZeRO.")
-        args.fp16 = True
-        args.bf16 = False
-
-    if args.deepspeed:
-        if args.checkpoint_activations:
-            args.deepspeed_activation_checkpointing = True
-        else:
-            args.deepspeed_activation_checkpointing = False
-        if args.deepspeed_config is not None:
-            deepspeed_config = args.deepspeed_config
-
-        if override_deepspeed_config:  # not specify deepspeed_config, use args
-            if args.fp16:
-                deepspeed_config["fp16"]["enabled"] = True
-            elif args.bf16:
-                deepspeed_config["bf16"]["enabled"] = True
-                deepspeed_config["fp16"]["enabled"] = False
-            else:
-                deepspeed_config["fp16"]["enabled"] = False
-            deepspeed_config["train_micro_batch_size_per_gpu"] = args.batch_size
-            deepspeed_config["gradient_accumulation_steps"] = args.gradient_accumulation_steps
-            optimizer_params_config = deepspeed_config["optimizer"]["params"]
-            optimizer_params_config["lr"] = args.lr
-            optimizer_params_config["weight_decay"] = args.weight_decay
-        else:  # override args with values in deepspeed_config
-            if args.rank == 0:
-                print_rank0("Will override arguments with manually specified deepspeed_config!")
-            if "fp16" in deepspeed_config and deepspeed_config["fp16"]["enabled"]:
-                args.fp16 = True
-            else:
-                args.fp16 = False
-            if "bf16" in deepspeed_config and deepspeed_config["bf16"]["enabled"]:
-                args.bf16 = True
-            else:
-                args.bf16 = False
-            if "train_micro_batch_size_per_gpu" in deepspeed_config:
-                args.batch_size = deepspeed_config["train_micro_batch_size_per_gpu"]
-            if "gradient_accumulation_steps" in deepspeed_config:
-                args.gradient_accumulation_steps = deepspeed_config["gradient_accumulation_steps"]
-            else:
-                args.gradient_accumulation_steps = None
-            if "optimizer" in deepspeed_config:
-                optimizer_params_config = deepspeed_config["optimizer"].get("params", {})
-                args.lr = optimizer_params_config.get("lr", args.lr)
-                args.weight_decay = optimizer_params_config.get("weight_decay", args.weight_decay)
-        args.deepspeed_config = deepspeed_config
-
-    # initialize distributed and random seed because it always seems to be necessary.
-    initialize_distributed(args)
-    args.seed = args.seed + mpu.get_data_parallel_rank()
-    set_random_seed(args.seed)
-    return args
-
+    return parser
 
 def initialize_distributed(args):
     """Initialize torch.distributed."""
@@ -256,9 +128,18 @@ def initialize_distributed(args):
 
     return True
 
-
 def process_config_to_args(args):
     """Fetch args from only --base"""
+    project_dir = os.path.join(os.path.dirname(__file__), "../../")
+
+    def extract_clean_path(base):
+        base = base[0].strip('["]')
+        clean_path = base.strip("[]").strip("'")
+        return clean_path
+    clean_path = extract_clean_path(args.base)
+
+    args.base = [os.path.join(project_dir, clean_path)]
+
 
     configs = [OmegaConf.load(cfg) for cfg in args.base]
     config = OmegaConf.merge(*configs)
@@ -282,4 +163,125 @@ def process_config_to_args(args):
         data_config = config.pop("data", OmegaConf.create())
         args.data_config = data_config
 
+    return args
+
+def getArgs():
+    parser = argparse.ArgumentParser(description="sat") 
+
+    parser.add_argument("--load_transformer", type=str, default="checkpoints/cogvideo/CogVideoX1.5-5B-SAT/transformer_t2v")
+    parser.add_argument("--input_type", type=str, default="txt")
+    parser.add_argument("--input_file", type=str, default="configs/005_cogvideox1.5/prompt.txt")
+    parser.add_argument("--output_dir", type=str, default="outputs")
+    parser.add_argument("--base", type=str, nargs="*", help="config for input and saving", default="configs/005_cogvideox1.5/cogvideox1.5_5b_t2v.yaml")
+    parser.add_argument("--mode_type", type=str, default="t2v")
+    parser.add_argument("--sampling_num_frames", type=int, default=22)
+    parser.add_argument("--image_folder", type=str, default="inputs/i2v/576x1024")
+
+    parser = add_model_config_args(parser)
+    parser = add_sampling_config_args(parser)
+    parser = add_training_args(parser)
+    parser = add_evaluation_args(parser)
+    parser = add_data_args(parser)
+    parser = deepspeed.add_config_arguments(parser)
+    args_list = ['--base', parser.parse_args().base]
+    args = parser.parse_args(args_list)
+    args = process_config_to_args(args)
+
+    args.cuda = torch.cuda.is_available()
+    args.rank = int(os.getenv("RANK", "0"))
+    args.world_size = int(os.getenv("WORLD_SIZE", "1"))
+    if args.local_rank is None:
+        args.local_rank = int(os.getenv("LOCAL_RANK", "0"))  # torchrun
+
+    if args.device == -1:
+        if torch.cuda.device_count() == 0:
+            args.device = "cpu"
+        elif args.local_rank is not None:
+            args.device = args.local_rank
+        else:
+            args.device = args.rank % torch.cuda.device_count()
+
+    if args.local_rank != args.device and args.mode != "inference":
+        raise ValueError(
+            "LOCAL_RANK (default 0) and args.device inconsistent. "
+            "This can only happens in inference mode. "
+            "Please use CUDA_VISIBLE_DEVICES=x for single-GPU training. "
+        )
+
+    if args.rank == 0:
+        print_rank0("using world size: {}".format(args.world_size))
+
+
+    if args.deepspeed:
+        if args.checkpoint_activations:
+            args.deepspeed_activation_checkpointing = True
+        else:
+            args.deepspeed_activation_checkpointing = False
+        if args.deepspeed_config is not None:
+            deepspeed_config = args.deepspeed_config
+
+        if override_deepspeed_config:  # not specify deepspeed_config, use args
+            if args.fp16:
+                deepspeed_config["fp16"]["enabled"] = True
+            elif args.bf16:
+                deepspeed_config["bf16"]["enabled"] = True
+                deepspeed_config["fp16"]["enabled"] = False
+            else:
+                deepspeed_config["fp16"]["enabled"] = False
+            deepspeed_config["train_micro_batch_size_per_gpu"] = args.batch_size
+            deepspeed_config["gradient_accumulation_steps"] = args.gradient_accumulation_steps
+            optimizer_params_config = deepspeed_config["optimizer"]["params"]
+            optimizer_params_config["lr"] = args.lr
+            optimizer_params_config["weight_decay"] = args.weight_decay
+        else:  # override args with values in deepspeed_config
+            if args.rank == 0:
+                print_rank0("Will override arguments with manually specified deepspeed_config!")
+            if "fp16" in deepspeed_config and deepspeed_config["fp16"]["enabled"]:
+                args.fp16 = True
+            else:
+                args.fp16 = False
+            if "bf16" in deepspeed_config and deepspeed_config["bf16"]["enabled"]:
+                args.bf16 = True
+            else:
+                args.bf16 = False
+            if "train_micro_batch_size_per_gpu" in deepspeed_config:
+                args.batch_size = deepspeed_config["train_micro_batch_size_per_gpu"]
+            if "gradient_accumulation_steps" in deepspeed_config:
+                args.gradient_accumulation_steps = deepspeed_config["gradient_accumulation_steps"]
+            else:
+                args.gradient_accumulation_steps = None
+            if "optimizer" in deepspeed_config:
+                optimizer_params_config = deepspeed_config["optimizer"].get("params", {})
+                args.lr = optimizer_params_config.get("lr", args.lr)
+                args.weight_decay = optimizer_params_config.get("weight_decay", args.weight_decay)
+        args.deepspeed_config = deepspeed_config
+
+    initialize_distributed(args)
+    args.seed = args.seed + mpu.get_data_parallel_rank()
+    set_random_seed(args.seed)
+
+    args.load = parser.parse_args().load_transformer
+    args.input_type = parser.parse_args().input_type
+    args.input_file = parser.parse_args().input_file
+    args.output_dir = parser.parse_args().output_dir
+    args.batch_size = 1
+    args.bf16 = True
+
+    del args.deepspeed_config
+    args.model_config.first_stage_config.params.cp_size = 1
+    args.model_config.network_config.params.transformer_args.model_parallel_size = 1
+    args.model_config.network_config.params.transformer_args.checkpoint_activations = False
+    args.model_config.loss_fn_config.params.sigma_sampler_config.params.uniform_sampling = False
+    args.force_inference = True
+    args.mode = "inference"
+    args.sampling_num_frames = parser.parse_args().sampling_num_frames
+
+    if parser.parse_args().mode_type == "t2v":
+        args.image2video = False
+        args.sampling_image_size = [768, 1360]
+    else:
+        args.image2video = True
+        args.model_config.network_config.params.in_channels = 32
+        args.image_path = parser.parse_args().image_folder
+        
     return args
