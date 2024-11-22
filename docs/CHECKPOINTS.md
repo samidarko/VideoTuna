@@ -11,12 +11,12 @@ mkdir checkpoints
 # ---------------------------- T2V ----------------------------
 
 # ---- CogVideo (diffusers) ----
-mkdir checkpoints/cogvideo
-cd checkpoints/cogvideo
+mkdir -p checkpoints/cogvideo; cd checkpoints/cogvideo
 git clone https://huggingface.co/THUDM/CogVideoX-2b         # This are checkpoints for CogVideoX T2V-2B
 git clone https://huggingface.co/THUDM/CogVideoX-5b         # This are checkpoints for CogVideoX T2V-5B
 git clone https://huggingface.co/THUDM/CogVideoX-5b-I2V     # This are checkpoints for CogVideoX I2V-5B
 git clone https://huggingface.co/THUDM/CogVideoX1.5-5B-SAT  # This are checkpoints for CogVideoX 1.5-5B (both T2V and I2V)
+
 
 # ---- Open-Sora ----
 mkdir -p checkpoints/open-sora/t2v_v10
