@@ -10,18 +10,13 @@ mkdir checkpoints
 
 # ---------------------------- T2V ----------------------------
 
-# ---- CogVideo ----
-mkdir -p checkpoints/cogvideo
-cd checkpoints/cogvideo
-git clone https://huggingface.co/THUDM/CogVideoX-2b
-git clone https://huggingface.co/THUDM/CogVideoX-5b
-git clone https://huggingface.co/THUDM/CogVideoX1.5-5B-SAT
-# VAE for CogVideoX-2B, 5B, 5B-I2V
-wget https://cloud.tsinghua.edu.cn/f/fdba7608a49c463ba754/?dl=1
-mv 'index.html?dl=1' vaesat.zip
-unzip vaesat.zip -d vaesat
-rm -rf vaesat.zip
-cd ..
+# ---- CogVideo (diffusers) ----
+mkdir -p checkpoints/cogvideo; cd checkpoints/cogvideo
+git clone https://huggingface.co/THUDM/CogVideoX-2b         # This are checkpoints for CogVideoX T2V-2B
+git clone https://huggingface.co/THUDM/CogVideoX-5b         # This are checkpoints for CogVideoX T2V-5B
+git clone https://huggingface.co/THUDM/CogVideoX-5b-I2V     # This are checkpoints for CogVideoX I2V-5B
+git clone https://huggingface.co/THUDM/CogVideoX1.5-5B-SAT  # This are checkpoints for CogVideoX 1.5-5B (both T2V and I2V)
+
 
 # ---- Open-Sora ----
 mkdir -p checkpoints/open-sora/t2v_v10
@@ -59,18 +54,25 @@ mkdir checkpoints/dynamicrafter/i2v_576x1024
 wget https://huggingface.co/Doubiiu/DynamiCrafter_1024/resolve/main/model.ckpt -P checkpoints/dynamicrafter/i2v_576x1024  # dynamicrafter-i2v-1024
 
 # ---- Videocrafter ----
-mkdir checkpoints/videocrafter/
-mkdir checkpoints/videocrafter/i2v_v1_512
+mkdir -p checkpoints/videocrafter/i2v_v1_512
 
 wget https://huggingface.co/VideoCrafter/Image2Video-512/resolve/main/model.ckpt -P checkpoints/videocrafter/i2v_v1_512 # videocrafter1-i2v-512
 
 # ---- Stable Diffusion checkpoint for VC2 Training ----
-mkdir checkpoints/stablediffusion/
-mkdir checkpoints/stablediffusion/v2-1_512-ema
+mkdir -p checkpoints/stablediffusion/v2-1_512-ema
+wget https://huggingface.co/stabilityai/stable-diffusion-2-1-base/resolve/main/v2-1_512-ema-pruned.ckpt -P checkpoints/stablediffusion/v2-1_512-ema
 
-wget https://huggingface.co/stabilityai/stable-diffusion-2-1-base/blob/main/v2-1_512-ema-pruned.ckpt -P checkpoints/stablediffusion/v2-1_512-ema
+
+# ---------------------------- V2V ----------------------------
+# ---- ModelScope Video-to-Video ----
+cd checkpoints
+# please ensure that you have installed lfs. If not, you can install it by running the following command:
+git lfs install
+# after installing lfs, you can clone the Video-to-Video checkpoints
+git clone https://www.modelscope.cn/iic/Video-to-Video.git
 
 ```
+
 
 ### Checkpoint Orgnization Structure
 After downloading, the model checkpoints should be placed as follows:  
