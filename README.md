@@ -419,6 +419,7 @@ We support video alignment post-training to align human perference for video dif
 
 ## Acknowledgement
 We thank the following repos for sharing their awesome models and codes!
+* [Mochi](https://www.genmo.ai/blog): A new SOTA in open-source video generation models
 * [VideoCrafter2](https://github.com/AILab-CVC/VideoCrafter): Overcoming Data Limitations for High-Quality Video Diffusion Models
 * [VideoCrafter1](https://github.com/AILab-CVC/VideoCrafter): Open Diffusion Models for High-Quality Video Generation
 * [DynamiCrafter](https://github.com/Doubiiu/DynamiCrafter): Animating Open-domain Images with Video Diffusion Priors
