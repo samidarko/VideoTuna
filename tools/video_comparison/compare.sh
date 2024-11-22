@@ -4,7 +4,7 @@ input_dir='inputs/t2v'
 save_dir='results/compare1/'
 seed=42
 unified_visualization_height=320
-inference_methods="videocrafter2;dynamicrafter;cogvideo—t2v;cogvideo—i2v;opensora"
+inference_methods="videocrafter2;dynamicrafter;cogvideo—t2v;cogvideo—i2v;opensora;mochi"
 
 #### check input ####
 # Check if the directory exists
@@ -115,6 +115,25 @@ if [[ $inference_methods == *"opensora"* ]]; then
       --fps ${fps} \
       --frames 16
 fi
+
+################################ mochi ################################
+if [[ $inference_methods == *"mochi"* ]]; then
+  ckpt='genmo/mochi-1-preview'
+  prompt_file="${input_dir}/prompts.txt"
+  savedir="${save_dir}/t2v/mochi-${width}x${height}-28fps"
+  height=480
+  width=848
+
+  python3 scripts/inference_mochi.py \
+      --ckpt_path $ckpt \
+      --prompt_file $prompt_file \
+      --savedir $savedir \
+      --bs 1 --height $height --width $width \
+      --fps 28 \
+      --seed 124
+fi
+
+
 
 #### combine video
 python3 tools/video_comparison/combine.py --save_dir=$save_dir --input_dir=$input_dir --unified_height=$unified_visualization_height
