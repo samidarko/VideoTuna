@@ -1,7 +1,7 @@
 load_transformer="checkpoints/cogvideo/CogVideoX1.5-5B-SAT/transformer_i2v"
 input_type="txt"
 input_file="inputs/i2v/576x1024/test_prompts.txt"
-output_dir="outputs"
+output_dir="results/i2v/"
 base="configs/005_cogvideox1.5/cogvideox1.5_5b.yaml"
 image_folder="inputs/i2v/576x1024/"
 

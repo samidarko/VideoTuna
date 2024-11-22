@@ -26,6 +26,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../src/cogvideo_sat"))
 from diffusion_video import SATVideoDiffusionEngine
 
 from arguments import getArgs
+import datetime
+current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+
 
 
 def read_from_file(p, rank=0, world_size=1):
@@ -104,7 +107,7 @@ def save_video_as_grid_and_mp4(video_batch: torch.Tensor, save_path: str, fps: i
             frame = rearrange(frame, "c h w -> h w c")
             frame = (255.0 * frame).cpu().numpy().astype(np.uint8)
             gif_frames.append(frame)
-        now_save_path = os.path.join(save_path, f"{i:06d}.mp4")
+        now_save_path = os.path.join(save_path, f"prompt-{key:04d}.mp4")
         with imageio.get_writer(now_save_path, fps=fps) as writer:
             for frame in gif_frames:
                 writer.append_data(frame)
@@ -190,8 +193,12 @@ def main(args, model_cls):
                     shape=shape
                 ).permute(0, 2, 1, 3, 4).contiguous()
 
+                # save_path = os.path.join(
+                #     args.output_dir, f"{cnt}_{text.replace(' ', '_').replace('/', '')[:120]}", str(index)
+                # )
+
                 save_path = os.path.join(
-                    args.output_dir, f"{cnt}_{text.replace(' ', '_').replace('/', '')[:120]}", str(index)
+                    args.output_dir, f"{current_time}-cogvideox1.5"
                 )
                 os.makedirs(save_path, exist_ok=True)
 
@@ -202,7 +209,7 @@ def main(args, model_cls):
                 else:
                     samples_x = torch.clamp((model.decode_first_stage(samples_z).permute(0, 2, 1, 3, 4) + 1.0) / 2.0, 0.0, 1.0).to(torch.float32).cpu()
                     if mpu.get_model_parallel_rank() == 0:
-                        save_video_as_grid_and_mp4(samples_x, save_path, fps=args.sampling_fps)
+                        save_video_as_grid_and_mp4(samples_x, save_path, fps=args.sampling_fps, key=cnt)
 
 if __name__ == "__main__":
     args = getArgs()
