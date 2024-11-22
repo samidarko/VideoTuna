@@ -317,7 +317,7 @@ VideoTuna/
 
 Please check [docs/CHECKPOINTS.md](docs/CHECKPOINTS.md) to download all the model checkpoints.
 
-[Title](docs/CHECKPOINTS.md)## 🔆 Get started
+## 🔆 Get started
 
 ### 1.Prepare environment
 ``` shell
@@ -373,23 +373,51 @@ Task|Model|Command|Length (#frames)|Resolution|Inference Time (s)|GPU Memory (Gi
 |T2I|Flux-schnell|`bash shscripts/inference_flux.sh`|1|768x1360|5.4|1.20|
 
 ### 4. Finetune T2V models
-#### (1). Prepare Dataset
+#### 4.1 Prepare dataset
 Please follow the [docs/datasets.md](docs/datasets.md) to try provided toydataset or build your own datasets.
 
-#### (2). Finetune
-#### Open-Sora finetuning
+#### 4.2 Fine-tune
+
+#### 1. VideoCrafter2 Full Fine-tuning
+Before started, we assume you have finished the following two preliminary steps:
+  1) [Install the environment](#1prepare-environment)
+  2) [Prepare the dataset   ](#41-prepare-dataset)
+  3) [Download the checkpoints](docs/CHECKPOINTS.md) and get these two checkpoints
+```
+  ll checkpoints/videocrafter/t2v_v2_512/model.ckpt
+  ll checkpoints/stablediffusion/v2-1_512-ema/model.ckpt
+```
+
+
+First, run this command to convert the VC2 checkpoint as we make minor modifications on the keys of the state dict of the checkpoint. The converted checkpoint will be automatically save at `checkpoints/videocrafter/t2v_v2_512/model_converted.ckpt`.    
+```
+python tools/convert_checkpoint.py --input_path checkpoints/videocrafter/t2v_v2_512/model.ckpt
+```
+
+
+Second, run this command to start training on the single GPU. The training results will be automatically saved at `results/train/${CURRENT_TIME}_${EXPNAME}`    
+```
+bash shscripts/train_videocrafter_v2.sh
+```
+
+
+
+
+
+#### 2. VideoCrafter2 Lora Fine-tuning
+
+We support lora finetuning to make the model to learn new concepts/characters/styles.   
+- Example config file: `configs/001_videocrafter2/vc2_t2v_lora.yaml`  
+- Training lora based on VideoCrafter2: `bash shscripts/train_videocrafter_lora.sh`  
+- Inference the trained models: `bash shscripts/inference_vc2_t2v_320x512_lora.sh`   
+
+#### 3. Open-Sora Fine-tuning
 We support open-sora finetuning, you can simply run the following commands:
 ``` shell
 # finetune the Open-Sora v1.0
 bash shscripts/train_opensorav10.sh
 ```
 
-#### Lora finetuning
-
-We support lora finetuning to make the model to learn new concepts/characters/styles.   
-- Example config file: `configs/001_videocrafter2/vc2_t2v_lora.yaml`  
-- Training lora based on VideoCrafter2: `bash shscripts/train_videocrafter_lora.sh`  
-- Inference the trained models: `bash shscripts/inference_vc2_t2v_320x512_lora.sh`   
 
 <!-- Please check [configs/train/003_vc2_lora_ft/README.md](configs/train/003_vc2_lora_ft/README.md) for details.    -->
 <!-- 
