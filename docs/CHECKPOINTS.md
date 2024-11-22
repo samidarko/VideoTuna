@@ -54,16 +54,13 @@ mkdir checkpoints/dynamicrafter/i2v_576x1024
 wget https://huggingface.co/Doubiiu/DynamiCrafter_1024/resolve/main/model.ckpt -P checkpoints/dynamicrafter/i2v_576x1024  # dynamicrafter-i2v-1024
 
 # ---- Videocrafter ----
-mkdir checkpoints/videocrafter/
-mkdir checkpoints/videocrafter/i2v_v1_512
+mkdir -p checkpoints/videocrafter/i2v_v1_512
 
 wget https://huggingface.co/VideoCrafter/Image2Video-512/resolve/main/model.ckpt -P checkpoints/videocrafter/i2v_v1_512 # videocrafter1-i2v-512
 
 # ---- Stable Diffusion checkpoint for VC2 Training ----
-mkdir checkpoints/stablediffusion/
-mkdir checkpoints/stablediffusion/v2-1_512-ema
-
-wget https://huggingface.co/stabilityai/stable-diffusion-2-1-base/blob/main/v2-1_512-ema-pruned.ckpt -P checkpoints/stablediffusion/v2-1_512-ema
+mkdir -p checkpoints/stablediffusion/v2-1_512-ema
+wget https://huggingface.co/stabilityai/stable-diffusion-2-1-base/resolve/main/v2-1_512-ema-pruned.ckpt -P checkpoints/stablediffusion/v2-1_512-ema
 
 
 # ---------------------------- V2V ----------------------------
