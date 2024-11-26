@@ -108,6 +108,41 @@ def load_inputs_i2v(input_dir, video_size=(256,256), video_frames=16):
         
     return filename_list, image_list, prompt_list
 
+def load_inputs_v2v(input_dir, video_size=None, video_frames=None):
+    """
+    Load prompt list and input videos for v2v from an input directory.
+    """
+    # load prompt files
+    prompt_files = get_target_filelist(input_dir, ext='txt')
+    if len(prompt_files) > 1:
+        # only use the first one (sorted by name) if multiple exist
+        print(f"Warning: multiple prompt files exist. The one {os.path.split(prompt_files[0])[1]} is used.")
+        prompt_file = prompt_files[0]
+    elif len(prompt_files) == 1:
+        prompt_file = prompt_files[0]
+    elif len(prompt_files) == 0:
+        print(prompt_files)
+        raise ValueError(f"Error: found NO prompt file in {input_dir}")
+    prompt_list = load_prompts(prompt_file)
+    n_samples = len(prompt_list)
+    
+    ## load videos
+    video_filepaths = get_target_filelist(input_dir, ext='[m][p][4]')
+    video_filenames = [os.path.split(video_filepath)[-1] for video_filepath in video_filepaths]
+
+    return prompt_list, video_filepaths, video_filenames
+
+def open_video_to_tensor(filepath, video_width=None, video_height=None):
+    if video_width is None and video_height is None:
+        vidreader = VideoReader(filepath, ctx=cpu(0), width=video_width, height=video_height)
+    else:
+        vidreader = VideoReader(filepath, ctx=cpu(0))
+    frame_indices = list(range(len(vidreader)))
+    frames = vidreader.get_batch(frame_indices)
+    frame_tensor = torch.tensor(frames.asnumpy()).permute(3, 0, 1, 2).float()
+    frame_tensor = (frame_tensor / 255. - 0.5) * 2
+    return frame_tensor.unsqueeze(0)
+
 def load_video_batch(filepath_list, frame_stride, video_size=(256,256), video_frames=16):
     '''
     Notice about some special cases:
