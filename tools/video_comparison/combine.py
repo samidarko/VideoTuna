@@ -8,6 +8,7 @@ import numpy as np
 parser = argparse.ArgumentParser(description='Check the input directory')
 parser.add_argument('--input_dir', type=str, help='The input should be a directory', required=True)
 parser.add_argument('--save_dir', type=str, help='The directory of saving results', required=True)
+parser.add_argument('--unified_height', type=int, help='The height of the unified video', default=320)
 args = parser.parse_args()
 
 methods = glob.glob(f'{args.save_dir}/*/*')
@@ -42,7 +43,7 @@ for video_index in range(num_of_videos):
 
     # txt_clip = TextClip('hello world', color='orange', size=(100, 100))
     # txt_clip = txt_clip.set_position('center').set_duration(max_duration)
-    # clips = [clip.resize(height=1080) for clip in clips]
+    clips = [clip.resize(height=args.unified_height) for clip in clips]
     # video_heights = [clip.size[1] for clip in clips] 
     # print(methods)
     # print(len(clips))
