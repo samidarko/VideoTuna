@@ -2,6 +2,7 @@ import torch
 from diffusers import MochiPipeline
 from diffusers.utils import export_to_video
 import argparse
+import os
 
 # create arg parser
 parser = argparse.ArgumentParser()
@@ -15,6 +16,8 @@ parser.add_argument("--fps", type=int, default=28)
 parser.add_argument("--seed", type=int, default=123)
 
 args = parser.parse_args()
+
+os.makedirs(args.savedir, exist_ok=True)
 
 pipe = MochiPipeline.from_pretrained("genmo/mochi-1-preview")
 # Enable memory savings

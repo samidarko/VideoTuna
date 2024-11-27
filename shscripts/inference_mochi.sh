@@ -1,4 +1,4 @@
-ckpt='genmo/mochi-1-preview'
+ckpt='checkpoints/mochi-1-preview'
 prompt_file="inputs/t2v/prompts.txt"
 savedir="results/t2v/mochi2"
 height=480
