@@ -120,9 +120,9 @@ fi
 if [[ $inference_methods == *"mochi"* ]]; then
   ckpt='genmo/mochi-1-preview'
   prompt_file="${input_dir}/prompts.txt"
-  savedir="${save_dir}/t2v/mochi-${width}x${height}-28fps"
   height=480
   width=848
+  savedir="${save_dir}/t2v/mochi-${width}x${height}-28fps"
 
   python3 scripts/inference_mochi.py \
       --ckpt_path $ckpt \
