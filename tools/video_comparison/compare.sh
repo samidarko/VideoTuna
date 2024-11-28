@@ -26,7 +26,7 @@ python tools/video_comparison/check_input.py --input_dir=$input_dir --seed=$seed
 
 ################################ videocrafter2 ################################
 ckpt='checkpoints/videocrafter/t2v_v2_512/model.ckpt'
-config='configs/train/000_videocrafter2ft/config.yaml'
+config='configs/001_videocrafter2/vc2_t2v_320x512.yaml'
 prompt_file="${input_dir}/prompts.txt"
 height=320
 width=512
@@ -46,7 +46,7 @@ fi
 
 ################################ dynamicrafter ################################
 ckpt=checkpoints/dynamicrafter/i2v_576x1024/model.ckpt
-config=configs/train/002_dynamicrafterft_1024/config.yaml
+config=configs/002_dynamicrafter/dc_i2v_1024.yaml
 prompt_dir="${input_dir}"
 height=576
 width=1024
@@ -93,7 +93,7 @@ fi
 
 ################################ opensora ################################
 ckpt="checkpoints/open-sora/t2v_v10/OpenSora-v1-HQ-16x256x256.pth"
-config='configs/train/001_opensorav10/config_opensorav10.yaml'
+config='configs/003_opensora/opensorav10_256x256.yaml'
 height=256
 width=256
 fps=8
