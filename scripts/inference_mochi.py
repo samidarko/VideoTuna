@@ -19,7 +19,7 @@ args = parser.parse_args()
 
 os.makedirs(args.savedir, exist_ok=True)
 
-pipe = MochiPipeline.from_pretrained("genmo/mochi-1-preview")
+pipe = MochiPipeline.from_pretrained("genmo/mochi-1-preview", variant="bf16", torch_dtype=torch.bfloat16)
 # Enable memory savings
 pipe.enable_model_cpu_offload()
 pipe.enable_vae_tiling()

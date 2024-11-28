@@ -4,7 +4,7 @@ input_dir='inputs/t2v'
 save_dir='results/compare1/'
 seed=42
 unified_visualization_height=320
-inference_methods="videocrafter2;dynamicrafter;cogvideo—t2v;cogvideo—i2v;opensora;mochi"
+inference_methods="videocrafter2;dynamicrafter;opensora;mochi"
 
 #### check input ####
 # Check if the directory exists
