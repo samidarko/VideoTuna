@@ -130,7 +130,7 @@ if [[ $inference_methods == *"mochi"* ]]; then
       --savedir $savedir \
       --bs 1 --height $height --width $width \
       --fps 28 \
-      --seed 124
+      --seed ${seed}
 fi
 
 
