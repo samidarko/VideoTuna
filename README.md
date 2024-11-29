@@ -478,12 +478,20 @@ We thank the following repos for sharing their awesome models and codes!
 </a>
 
 ## 📋 License
-Please follow [CC-BY-NC-ND](./LICENSE). If you want a license authorization, please contact yhebm@connect.ust.hk and yxingag@connect.ust.hk.
+Please follow [CC-BY-NC-ND](./LICENSE). If you want a license authorization, please contact the project leads Yingqing He (yhebm@connect.ust.hk) and Yazhou Xing (yxingag@connect.ust.hk).
 
 ## 😊 Citation
+
+```bibtex
+@software{videotuna,
+  author = {Yingqing He and Yazhou Xing and Zhefan Rao and Haoyu Wu and Zhaoyang Liu and Jingye Chen and Pengjun Fang and Jiajun Li and Liya Ji and Runtao Liu and Xiaowei Chi and Yang Fei and Guocheng Shao and Yue Ma and Qifeng Chen},
+  title = {VideoTuna: A Powerful Toolkit for Video Generation with Model Fine-Tuning and Post-Training},
+  month = {Nov},
+  year = {2024},
+  url = {https://github.com/VideoVerses/VideoTuna}
+}
 ```
-To be updated...
-```
+
 
 ## Star History
 
