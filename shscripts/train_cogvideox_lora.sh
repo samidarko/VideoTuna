@@ -14,4 +14,4 @@ python scripts/train.py \
 --logdir $RESROOT \
 --devices '0,' \
 lightning.trainer.num_nodes=1 \
---auto_resume False
+--auto_resume
