@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append(os.getcwd())
 import random
 import copy
 import pandas as pd
@@ -62,12 +64,14 @@ class DatasetFromCSV(torch.utils.data.Dataset):
         csv_path: Union[str, List[str]],
         data_root: Union[str, List[str], None] = None,
         transform: Union[Dict[str, Compose], None] = None,
-        resolution: Union[int, Tuple[int]] = (256, 256),
+        height: int = 256,
+        width: int = 256,
         num_frames: int = 16,
         frame_interval: int = 1,
         use_multi_res: bool = False,
         train: bool = True,
         split_val: bool = False,
+        image_to_video: bool = False,
         **kwargs,
     ):
         self.csv_path = csv_path
@@ -85,15 +89,17 @@ class DatasetFromCSV(torch.utils.data.Dataset):
 
         if transform is None:
             transform = dict(
-                video=get_transforms_video(resolution, num_frames, frame_interval),
-                image=get_transforms_image(resolution, num_frames),
+                video=get_transforms_video((height, width), num_frames, frame_interval),
+                image=get_transforms_image((height, width), num_frames),
             )
 
         assert (
             "video" in transform or "image" in transform
         ), "The transform should contain 'video' or 'image'."
         self.transform = transform
-        self.resolution = resolution
+        self.height = height
+        self.width = width
+        self.resolution = (height, width)
         self.num_frames = num_frames
         self.frame_interval = frame_interval
         self.frame_limit = num_frames * frame_interval
@@ -102,7 +108,8 @@ class DatasetFromCSV(torch.utils.data.Dataset):
         self.train = train
         self.split_val = split_val
         self.safe_data_list = set()
-        self.check_video = CheckVideo(resolution, frame_interval, num_frames)
+        self.image_to_video = image_to_video
+        self.check_video = CheckVideo(self.resolution, frame_interval, num_frames)
 
         self.load_annotations(csv_path, data_root)
 
@@ -134,7 +141,10 @@ class DatasetFromCSV(torch.utils.data.Dataset):
 
                 if data_root[i]:
                     video_path = os.path.join(data_root[i], video_path)
-                data_dict = {"path": video_path, "caption": caption}
+                data_dict = {
+                    "path": video_path, 
+                    "caption": caption
+                }
                 data_dict["fps"] = (
                     row.get("fps") / self.frame_interval
                     if row.get("fps", None)
@@ -151,7 +161,7 @@ class DatasetFromCSV(torch.utils.data.Dataset):
         path = data.pop("path")
         if is_video(path):
             video = read_video(path)
-            video = self.check_video(video)  # filter the video with unsatisfied resolution and frames
+            video = self.check_video(video, index)  # filter the video with unsatisfied resolution and frames
             video = self.transform["video"](video)
         elif is_image(path):
             video = pil_loader(path)
@@ -186,7 +196,9 @@ class DatasetFromCSV(torch.utils.data.Dataset):
 
         if "frames" in data:
             _ = data.pop("frames")
-
+        
+        if self.image_to_video:
+            data["image"] = data["video"][:,:1,:,:].clone() # CTHW (3，1，H, W)
         return data
 
     def __getitem__(self, index):
@@ -247,7 +259,6 @@ class DatasetFromCSV(torch.utils.data.Dataset):
 
 
 if __name__ == "__main__":
-    csv_path = '/project/llmsvgen/share/opensora_datafile/artgrid_caption_long_base.csv'
-    dataset = DatasetFromCSV(csv_path, train=True, split_val=True)
+    csv_path = "temp/apply_lipstick.csv"
+    dataset = DatasetFromCSV(csv_path, train=True, split_val=True, height=480, width=720, num_frames=49, image_to_video=True)
     data = dataset[0]
-    print('test')

@@ -1,3 +1,4 @@
+import math
 import torch
 import inspect
 from transformers import T5EncoderModel, T5Tokenizer
@@ -112,10 +113,10 @@ class CogVideoXWorkFlow(pl.LightningModule):
         # max_sequence_length=226 
         self.instantiate_cond_stage(cond_stage_config)
         self.vae_scale_factor_spatial = (
-            2 ** (len(self.first_stage_model.config.block_out_channels) - 1) if hasattr(self, "first_stage_model") and self.first_stage_model is not None else 8
+            2 ** (len(self.vae.config.block_out_channels) - 1) if hasattr(self, "first_stage_model") and self is not None else 8
         )
         self.vae_scale_factor_temporal = (
-            self.first_stage_model.config.temporal_compression_ratio if hasattr(self, "first_stage_model") and self.first_stage_model is not None else 4
+            self.vae.config.temporal_compression_ratio if hasattr(self, "first_stage_model") and self.vae is not None else 4
         )
 
         self.video_processor = VideoProcessor(vae_scale_factor=self.vae_scale_factor_spatial)
@@ -132,10 +133,11 @@ class CogVideoXWorkFlow(pl.LightningModule):
         self.lora_args = []
         if adapter_config is not None:
             self.inject_adapter(adapter_config)
+    
     def inject_adapter(self, adapter_config):
         self.model.requires_grad_(False)
         self.model.enable_gradient_checkpointing()
-        print("Injecting adapter")
+        print("Injecting lora adapter")
         transformer_adapter_config = instantiate_from_config(adapter_config)   
         print(transformer_adapter_config)
         self.model = get_peft_model(self.model, transformer_adapter_config)
@@ -146,14 +148,14 @@ class CogVideoXWorkFlow(pl.LightningModule):
     def instantiate_first_stage(self, config):
         # import pdb;pdb.set_trace()
         model = instantiate_from_config(config)
-        self.first_stage_model = model.eval()
-        # self.first_stage_model.train = disabled_train
-        self.first_stage_model.requires_grad_(False)
+        self.vae = model.eval()
+        # self.vae.train = disabled_train
+        self.vae.requires_grad_(False)
         
     @torch.no_grad()
     def encode_first_stage(self, x):
         x = x.permute(0, 2, 1, 3, 4)  # [B, C, F, H, W]
-        latent_dist = self.first_stage_model.encode(x).latent_dist
+        latent_dist = self.vae.encode(x).latent_dist
         return latent_dist
 
     def _decode_core(self, z, **kwargs):
@@ -161,7 +163,7 @@ class CogVideoXWorkFlow(pl.LightningModule):
 
         if self.encoder_type == "2d" and z.dim() == 5:
             return self.decode_first_stage_2DAE(z)
-        results = self.first_stage_model.decode(z, **kwargs)
+        results = self.vae.decode(z, **kwargs)
         return results
 
     @torch.no_grad()
@@ -195,10 +197,11 @@ class CogVideoXWorkFlow(pl.LightningModule):
 
     def decode_latents(self, latents: torch.Tensor) -> torch.Tensor:
         latents = latents.permute(0, 2, 1, 3, 4)  # [batch_size, num_channels, num_frames, height, width]
-        latents = 1 / self.first_stage_model.config.scaling_factor * latents
+        latents = 1 / self.vae.config.scaling_factor * latents
 
-        frames = self.first_stage_model.decode(latents).sample
+        frames = self.vae.decode(latents).sample
         return frames
+    
     # Copied from diffusers.pipelines.latte.pipeline_latte.LattePipeline.check_inputs
     def check_inputs(
         self,
@@ -394,9 +397,9 @@ class CogVideoXWorkFlow(pl.LightningModule):
 
     def decode_latents(self, latents: torch.Tensor) -> torch.Tensor:
         latents = latents.permute(0, 2, 1, 3, 4)  # [batch_size, num_channels, num_frames, height, width]
-        latents = 1 / self.first_stage_model.config.scaling_factor * latents
+        latents = 1 / self.vae.config.scaling_factor * latents
         # print(">>>>>>",latents.shape)
-        frames = self.first_stage_model.decode(latents).sample
+        frames = self.vae.decode(latents).sample
         return frames
 
     # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.prepare_extra_step_kwargs
@@ -706,8 +709,6 @@ class CogVideoXWorkFlow(pl.LightningModule):
             #     progress_bar.update()
         
         self.model.cpu()
-        # print("latent shape ",latents.shape)
-        # print(type(latents))
         if not output_type == "latent":
             video = self.decode_latents(latents)
             # video = self.video_processor.postprocess_video(video=video, output_type=output_type)
@@ -719,7 +720,6 @@ class CogVideoXWorkFlow(pl.LightningModule):
         video = video[None,...]
         video = video.cpu()
         torch.cuda.empty_cache()
-        # print(type(video),len(video),type(video[0]),video.shape)
         return video 
     
     # trianing specific functions 
@@ -736,24 +736,28 @@ class CogVideoXWorkFlow(pl.LightningModule):
         pass
     def encode_video(self,video):
         video = video.to(self.device, dtype=self.dtype).unsqueeze(0)
-        video = video.permute(0, 2, 1, 3, 4)  # [B, C, F, H, W]
-        latent_dist = self.first_stage_model.encode(video).latent_dist
+        # video = video.permute(0, 2, 1, 3, 4)  # [B, C, F, H, W]
+        latent_dist = self.vae.encode(video).latent_dist
         return latent_dist
     def get_batch_input(self, batch):
+        """
+        Prepare model batch inputs 
+        """
         # equal to collate_fn
         # the resonable video latents range is [-5,5], approximately.
-        videos = [self.encode_video(video) for video in batch["instance_video"]]
-        videos = [video.sample() * self.first_stage_model.config.scaling_factor for video in videos]
-        prompts = [item for item in batch["instance_prompt"]]
+        # videos
+        videos = [self.encode_video(video) for video in batch["video"]]
+        videos = [video.sample() * self.vae.config.scaling_factor for video in videos]
         videos = torch.cat(videos, dim=0)
         videos = videos.to(memory_format=torch.contiguous_format).float()
+        # prompt
+        prompts = [item for item in batch["caption"]]
         return {
             "videos": videos,
             "prompts": prompts,
         }
     
     def training_step(self, batch, batch_idx):
-        # print(type(batch),batch.keys(),type(batch['instance_video']),batch['instance_video'].shape);exit(); # <class 'dict'> dict_keys(['instance_prompt', 'instance_video'])
         batch = self.get_batch_input(batch)
         model_input = batch["videos"].permute(0, 2, 1, 3, 4).to(dtype=self.dtype)  # [B, F, C, H, W]
         prompts = batch["prompts"]
@@ -769,9 +773,10 @@ class CogVideoXWorkFlow(pl.LightningModule):
                 dtype=self.dtype,
             )
         
+        batch_size, num_frames, num_channels, height, width = model_input.shape
+        
         # Sample noise that will be added to the latents
         noise = torch.randn_like(model_input)
-        batch_size, num_frames, num_channels, height, width = model_input.shape
 
         # Sample a random timestep for each image
         timesteps = torch.randint(
@@ -817,9 +822,10 @@ class CogVideoXWorkFlow(pl.LightningModule):
         return loss 
     
 if __name__=="__main__":
+    # test text encoder
     prompt = ["Elon mask is talking"]
-    device ="cuda"
-    dtype  ="float32"
+    device = "cuda"
+    dtype  = "float32"
     tokenizer = T5Tokenizer.from_pretrained(
         "THUDM/CogVideoX-2b", subfolder="tokenizer"
     )

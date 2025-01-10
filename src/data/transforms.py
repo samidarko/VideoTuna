@@ -23,9 +23,10 @@ import decord
 from decord import VideoReader, cpu
 from einops import rearrange
 import torch
+import torch.nn.functional as F
 import torchvision.transforms as torch_transforms
 from torchvision.datasets.folder import pil_loader
-
+from torchvision.io import write_video
 from .datasets_utils import VIDEO_EXTS, IMG_EXTS
 
 
@@ -218,7 +219,7 @@ def get_transforms_video(resolution=(256, 256), num_frames=16, frame_interval=1)
             TemporalRandomCrop(num_frames, frame_interval),
             ToTensorVideo(),  # TCHW
             RandomHorizontalFlipVideo(),
-            UCFCenterCropVideo(resolution),
+            ResizeCenterCropVideo(resolution),
             torch_transforms.Normalize(
                 mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], inplace=True
             ),
@@ -324,6 +325,82 @@ class CenterCropResizeVideo:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(size={self.size}, interpolation_mode={self.interpolation_mode}"
 
+class ResizeCenterCropVideo:
+    """
+    First resize to the specified size in equal proportion to the short edge,
+    Then center crop to the desired size
+    """
+
+    def __init__(
+        self,
+        size,
+        interpolation_mode="bilinear",
+    ):
+        if isinstance(size, tuple):
+            if len(size) != 2:
+                raise ValueError(
+                    f"size should be tuple (height, width), instead got {size}"
+                )
+            self.size = size
+        else:
+            self.size = (size, size)
+        self.interpolation_mode = interpolation_mode
+
+    def __call__(self, clip):
+        """
+        Args:
+            clip (Tensor): Tensor of shape (T, C, H, W) representing video frames.
+        
+        Returns:
+            Tensor: Processed video of shape (T, C, target_H, target_W).
+        """
+        resized_clip = self.resize_with_aspect_ratio(clip)
+        cropped_clip = self.center_crop(resized_clip)
+        return cropped_clip
+
+    def resize_with_aspect_ratio(self, clip):
+        """
+        Resize the video tensor to maintain aspect ratio with the short edge.
+        """
+        T, C, H, W = clip.shape
+        target_h, target_w = self.size
+
+        # Determine the scaling factor based on the edge with the max scaling factor
+        scale_factor = max(target_h / H, target_w / W)
+        new_h, new_w = int(H * scale_factor), int(W * scale_factor)
+        # if H < W:  # Short edge is height
+        #     scale_factor = target_h / H
+        #     new_h, new_w = target_h, int(W * scale_factor)
+        # else:  # Short edge is width
+        #     scale_factor = target_w / W
+        #     new_h, new_w = int(H * scale_factor), target_w
+
+        # Resize each frame in the video clip
+        resized_clip = F.interpolate(
+            clip,
+            size=(new_h, new_w),
+            mode=self.interpolation_mode,
+            align_corners=False
+        )
+        return resized_clip
+
+    def center_crop(self, clip):
+        """
+        Center crop the video tensor to the desired size.
+        """
+        T, C, H, W = clip.shape
+        target_h, target_w = self.size
+        assert H >= target_h and W >= target_w, "Video dimensions should be larger than crop size"  
+        # Compute cropping indices
+        top = (H - target_h) // 2
+        left = (W - target_w) // 2
+
+        # Perform cropping
+        cropped_clip = clip[:, :, top:top + target_h, left:left + target_w]
+        return cropped_clip
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(size={self.size}, interpolation_mode={self.interpolation_mode}"
 
 class UCFCenterCropVideo:
     """
@@ -578,8 +655,8 @@ class CheckVideo:
         self.num_frames = num_frames
         self.frame_limit = num_frames * frame_interval
 
-    def __call__(self, vframes):
-        length = vframes.shape[0]
+    def __call__(self, vframes, index):
+        length = vframes.shape[0] # [F, C, H, W]
         h = vframes.shape[2]
         w = vframes.shape[3]
         if length <= self.frame_limit:

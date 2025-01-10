@@ -30,6 +30,7 @@ class VideoDataset(Dataset):
         skip_frames_end: int = 0,
         cache_dir: Optional[str] = None,
         id_token: Optional[str] = None,
+        image_to_video: bool = False,
     ) -> None:
         super().__init__()
 
@@ -46,6 +47,7 @@ class VideoDataset(Dataset):
         self.skip_frames_end = skip_frames_end
         self.cache_dir = cache_dir
         self.id_token = id_token or ""
+        self.image_to_video = image_to_video
 
         if dataset_name is not None:
             self.instance_prompts, self.instance_video_paths = self._load_dataset_from_hub()
@@ -64,10 +66,18 @@ class VideoDataset(Dataset):
         return self.num_instance_videos
 
     def __getitem__(self, index):
-        return {
-            "instance_prompt": self.id_token + self.instance_prompts[index],
-            "instance_video": self.instance_videos[index],
-        }
+        if self.image_to_video:
+            image = self.instance_videos[index][:1].clone()
+            return {
+                "instance_prompt": self.id_token + self.instance_prompts[index],
+                "instance_video": self.instance_videos[index],
+                "instance_image": image,
+            }
+        else:
+            return {
+                "instance_prompt": self.id_token + self.instance_prompts[index],
+                "instance_video": self.instance_videos[index],
+            }
 
     def _load_dataset_from_hub(self):
         try:
