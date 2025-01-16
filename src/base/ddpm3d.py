@@ -895,20 +895,25 @@ class LVDMFlow(DDPMFlow):
 
     @torch.no_grad()
     def sample(self, cond, batch_size=16, return_intermediates=False, x_T=None, \
-               verbose=True, timesteps=None, mask=None, x0=None, shape=None, **kwargs):
+               verbose=True, timesteps=None, mask=None, x0=None, shape=None, decode=True, **kwargs):
         if shape is None:
             shape = (batch_size, self.channels, self.temporal_length, *self.image_size)
+        
         if cond is not None:
             if isinstance(cond, dict):
                 cond = {key: cond[key][:batch_size] if not isinstance(cond[key], list) else
                 list(map(lambda x: x[:batch_size], cond[key])) for key in cond}
             else:
                 cond = [c[:batch_size] for c in cond] if isinstance(cond, list) else cond[:batch_size]
-        return self.p_sample_loop(cond,
-                                  shape,
-                                  return_intermediates=return_intermediates, x_T=x_T,
-                                  verbose=verbose, timesteps=timesteps,
-                                  mask=mask, x0=x0, **kwargs)
+        
+        samples = self.p_sample_loop(cond,
+                                    shape,
+                                    return_intermediates=return_intermediates, x_T=x_T,
+                                    verbose=verbose, timesteps=timesteps,
+                                    mask=mask, x0=x0, **kwargs)
+        if decode:
+            samples = self.decode_first_stage(samples)
+        return samples
 
     @torch.no_grad()
     def sample_log(self, cond, batch_size, ddim, ddim_steps, **kwargs):        
