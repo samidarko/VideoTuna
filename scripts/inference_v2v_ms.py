@@ -6,7 +6,7 @@ from modelscope.models import Model
 from modelscope.pipelines import pipeline	
 from modelscope.outputs import OutputKeys	
 
-from scripts.inference_utils import load_inputs_v2v
+from src.utils.inference_utils import load_inputs_v2v
 
 def get_parser():
     parser = argparse.ArgumentParser()

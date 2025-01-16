@@ -2,7 +2,7 @@ import os
 import torch
 from diffusers import FluxPipeline
 import argparse
-from inference_utils import load_prompt_file
+from src.utils.inference_utils import load_prompts_from_txt
 
 def inference(args):
     if args.model_type=='dev':
@@ -18,7 +18,7 @@ def inference(args):
     pipe.to(torch.float16) 
     if args.prompt.endswith(".txt"):
         # model_input is a file for t2i
-        prompts = load_prompt_file(prompt_file=args.prompt)
+        prompts = load_prompts_from_txt(prompt_file=args.prompt)
         os.makedirs(args.out_path, exist_ok=True)
         out_paths = [os.path.join(args.out_path, f"{i:05d}_{prompts[i]}.jpg") for i in range(len(prompts))]
     else:

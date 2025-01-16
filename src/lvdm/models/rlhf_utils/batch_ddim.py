@@ -130,17 +130,6 @@ def load_model_checkpoint(model, ckpt):
     return model
 
 
-def load_prompts(prompt_file):
-    f = open(prompt_file, 'r')
-    prompt_list = []
-    for idx, line in enumerate(f.readlines()):
-        l = line.strip()
-        if len(l) != 0:
-            prompt_list.append(l)
-        f.close()
-    return prompt_list
-
-
 def load_video_batch(filepath_list, frame_stride, video_size=(256,256), video_frames=16):
     '''
     Notice about some special cases:

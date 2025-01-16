@@ -19,7 +19,7 @@ from src.utils.common_utils import instantiate_from_config
 from src.utils.inference_utils import (
     get_target_filelist,
     load_model_checkpoint, 
-    load_prompts, 
+    load_prompts_from_txt, 
     save_videos,
     save_videos_vbench,
 )
@@ -93,7 +93,7 @@ def load_inputs(args):
     if args.prompt_file is not None:
         assert(os.path.exists(args.prompt_file))
         # load inputs for t2v
-        prompt_list = load_prompts(args.prompt_file)
+        prompt_list = load_prompts_from_txt(args.prompt_file)
         num_prompts = len(prompt_list)
         filename_list = [f"prompt-{idx+1:04d}" for idx in range(num_prompts)]
         image_list = None
@@ -122,13 +122,12 @@ def load_inputs_i2v(input_dir, video_size=(480,720), video_frames=49):
     elif len(prompt_files) == 0:
         print(prompt_files)
         raise ValueError(f"Error: found NO prompt file in {input_dir}")
-    prompt_list = load_prompts(prompt_file)
+    prompt_list = load_prompts_from_txt(prompt_file)
     n_samples = len(prompt_list)
     
     ## load images
-    img_list = get_target_filelist(input_dir, ext='[mpj][pne][4gj]')
-    # img_list = get_target_filelist(input_dir, ext='[mpjw][pne][4gjb][p]')
-    print(f"Found {n_samples} prompts and {len(img_list)} images in {input_dir}")
+    img_paths = get_target_filelist(input_dir, ext='png, jpg, webp, jpeg')
+    print(f"Found {n_samples} prompts and {len(img_paths)} images in {input_dir}")
     # image transforms
     transform = transforms.Compose([
         transforms.Resize(min(video_size)),
@@ -139,13 +138,12 @@ def load_inputs_i2v(input_dir, video_size=(480,720), video_frames=49):
     image_list = []
     filename_list = []
     for idx in range(n_samples):
-        
-        image = Image.open(img_list[idx]).convert('RGB')
+        image = Image.open(img_paths[idx]).convert('RGB')
         # image_tensor = transform(image).unsqueeze(0) # [c,h,w]
         # frame_tensor = repeat(image_tensor, 'c t h w -> c (repeat t) h w', repeat=video_frames)
         image_list.append(image)
         
-        _, filename = os.path.split(img_list[idx])
+        _, filename = os.path.split(img_paths[idx])
         filename_list.append(filename.split(".")[0])
         
     return filename_list, image_list, prompt_list

@@ -33,13 +33,7 @@ from diffusers import (
 )
 sys.path.insert(0, os.getcwd())
 from diffusers.utils import export_to_video, load_image, load_video
-from scripts.inference_utils import get_target_filelist
-
-def load_prompt_file(prompt_file: str):
-    with open(prompt_file, "r") as f:
-        prompts = f.readlines()
-    prompts = [prompt.strip() for prompt in prompts]
-    return prompts
+from src.utils.inference_utils import get_target_filelist, load_prompts_from_txt
 
 def generate_video(
     model_input: str,
@@ -76,19 +70,19 @@ def generate_video(
     
     if model_input.endswith(".txt"):
         # model_input is a file for t2v
-        prompts = load_prompt_file(prompt_file=model_input)
+        prompts = load_prompts_from_txt(prompt_file=model_input)
         image_or_video_paths = [None] * len(prompts)
     elif os.path.isdir(model_input):
         if generate_type == "i2v":
             # model_input is a directory for i2v
-            prompt_file = glob.glob(os.path.join(model_input, "*.txt"))[0]
-            prompts = load_prompt_file(prompt_file=prompt_file)
-            images = get_target_filelist(model_input, ext='[mpj][pn][4gj]')
+            prompt_file = get_target_filelist(model_input, ext='txt')[0]
+            prompts = load_prompts_from_txt(prompt_file=prompt_file)
+            images = get_target_filelist(model_input, ext='png, jpg, webp, jpeg')
             image_or_video_paths = images
         elif generate_type == "v2v":
             # model_input is a directory for v2v
-            prompt_file = glob.glob(os.path.join(model_input, "*.txt"))[0]
-            prompts = load_prompt_file(prompt_file=prompt_file)
+            prompt_file = get_target_filelist(model_input, ext='txt')[0]
+            prompts = load_prompts_from_txt(prompt_file=prompt_file)
             videos = [os.path.join(model_input, f) for f in os.listdir(model_input) if f.endswith(".mp4")]
             image_or_video_paths = videos
     else:

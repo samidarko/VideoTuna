@@ -14,24 +14,34 @@ import torchvision.transforms as transforms
 
 from utils.load_weights import load_safetensors
 
-def load_prompt_file(prompt_file: str):
-    with open(prompt_file, "r") as f:
-        prompts = f.readlines()
-    prompts = [prompt.strip() for prompt in prompts]
-    return prompts
-
-def get_target_filelist(data_dir, ext='*'):
+def get_target_filelist(data_dir, ext):
     """
     Generate a sorted filepath list with target extensions.
+    Args:
+        data_dir (str): The directory to search for files.
+        ext (str): A comma-separated string of file extensions to match.
+               Examples:
+                   - ext = "png,jpg,webp" (multiple extensions)
+                   - ext = "png" (single extension)
+    Returns: list: A sorted list of file paths matching the given extensions.
     """
-    file_list = sorted(glob.glob(os.path.join(data_dir, f'*.{ext}')))
+    file_list = [os.path.join(data_dir, f) for f in os.listdir(data_dir) if f.endswith(tuple(ext.split(',')))]
+    if len(file_list) == 0:
+        raise ValueError(f'No file with extensions {ext} found in {data_dir}.')
     return file_list
+
+def load_prompts_from_txt(prompt_file: str):
+    """ Load and return a list of prompts from a text file, stripping whitespace. """
+    with open(prompt_file, "r") as f:
+        lines = f.readlines()
+    prompt_list = [line.strip() for line in lines if line.strip() != '']
+    return prompt_list
 
 def load_model_checkpoint(model, ckpt):
     def load_checkpoint(model, ckpt, full_strict):
         state_dict = torch.load(ckpt, map_location="cpu")
         try:
-            ## deepspeed
+            # deepspeed version
             new_pl_sd = OrderedDict()
             for key in state_dict['module'].keys():
                 new_pl_sd[key[16:]]=state_dict['module'][key]
@@ -53,14 +63,7 @@ def load_model_checkpoint(model, ckpt):
     print('[INFO] model checkpoint loaded.')
     return model
 
-def load_prompts(prompt_file):
-    """
-    Load a list of prompts from a text file.
-    """
-    prompt_list = []
-    with open(prompt_file, 'r') as f:
-        prompt_list = [line.strip() for line in f if line.strip() != '']
-    return prompt_list
+
 
 def load_inputs_i2v(input_dir, video_size=(256,256), video_frames=16):
     """
@@ -77,12 +80,11 @@ def load_inputs_i2v(input_dir, video_size=(256,256), video_frames=16):
     elif len(prompt_files) == 0:
         print(prompt_files)
         raise ValueError(f"Error: found NO prompt file in {input_dir}")
-    prompt_list = load_prompts(prompt_file)
+    prompt_list = load_prompts_from_txt(prompt_file)
     n_samples = len(prompt_list)
     
     ## load images
-    # img_list = get_target_filelist(input_dir, ['webp', 'jpg', 'png', 'jpeg', 'JPEG', 'PNG'])
-    img_list = get_target_filelist(input_dir, ext='[mpj][pn][4gj]')
+    img_paths = get_target_filelist(input_dir, ext='png, jpg, webp, jpeg')
 
     # image transforms
     transform = transforms.Compose([
@@ -95,15 +97,50 @@ def load_inputs_i2v(input_dir, video_size=(256,256), video_frames=16):
     filename_list = []
     for idx in range(n_samples):
         # load, transform, repeat 4D T~ to 5D
-        image = Image.open(img_list[idx]).convert('RGB')
+        image = Image.open(img_paths[idx]).convert('RGB')
         image_tensor = transform(image).unsqueeze(1) # [c,1,h,w]
         frame_tensor = repeat(image_tensor, 'c t h w -> c (repeat t) h w', repeat=video_frames)
         image_list.append(frame_tensor)
         
-        _, filename = os.path.split(img_list[idx])
+        _, filename = os.path.split(img_paths[idx])
         filename_list.append(filename.split(".")[0])
         
     return filename_list, image_list, prompt_list
+
+def load_inputs_v2v(input_dir, video_size=None, video_frames=None):
+    """
+    Load prompt list and input videos for v2v from an input directory.
+    """
+    # load prompt files
+    prompt_files = get_target_filelist(input_dir, ext='txt')
+    if len(prompt_files) > 1:
+        # only use the first one (sorted by name) if multiple exist
+        print(f"Warning: multiple prompt files exist. The one {os.path.split(prompt_files[0])[1]} is used.")
+        prompt_file = prompt_files[0]
+    elif len(prompt_files) == 1:
+        prompt_file = prompt_files[0]
+    elif len(prompt_files) == 0:
+        print(prompt_files)
+        raise ValueError(f"Error: found NO prompt file in {input_dir}")
+    prompt_list = load_prompts_from_txt(prompt_file)
+    n_samples = len(prompt_list)
+    
+    ## load videos
+    video_filepaths = get_target_filelist(input_dir, ext='mp4')
+    video_filenames = [os.path.split(video_filepath)[-1] for video_filepath in video_filepaths]
+
+    return prompt_list, video_filepaths, video_filenames
+
+def open_video_to_tensor(filepath, video_width=None, video_height=None):
+    if video_width is None and video_height is None:
+        vidreader = VideoReader(filepath, ctx=cpu(0), width=video_width, height=video_height)
+    else:
+        vidreader = VideoReader(filepath, ctx=cpu(0))
+    frame_indices = list(range(len(vidreader)))
+    frames = vidreader.get_batch(frame_indices)
+    frame_tensor = torch.tensor(frames.asnumpy()).permute(3, 0, 1, 2).float()
+    frame_tensor = (frame_tensor / 255. - 0.5) * 2
+    return frame_tensor.unsqueeze(0)
 
 def load_video_batch(filepath_list, frame_stride, video_size=(256,256), video_frames=16):
     '''
@@ -155,8 +192,6 @@ def load_image_batch(filepath_list, image_size=(256,256)):
         elif ext == '.png' or ext == '.jpg':
             img = Image.open(filepath).convert("RGB")
             rgb_img = np.array(img, np.float32)
-            #bgr_img = cv2.imread(filepath, cv2.IMREAD_COLOR)
-            #bgr_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
             rgb_img = cv2.resize(rgb_img, (image_size[1],image_size[0]), interpolation=cv2.INTER_LINEAR)
             img_tensor = torch.from_numpy(rgb_img).permute(2, 0, 1).float()
         else:
@@ -223,16 +258,16 @@ def sample_batch_i2v(model, sampler, prompts, images, noise_shape,
     batch_size = noise_shape[0]
     
     # ----------------------------------------------------------------------------------
-    # prepare cond for i2v
+    # prepare condition for i2v
     fs = torch.tensor([fs] * batch_size, dtype=torch.long, device=model.device)
 
-    # cond: txt emb, img emb
+    # cond: text embedding, image embedding
     img = images[:,:,0] #bchw
     img_emb = model.embedder(img) ## blc
     img_emb = model.image_proj_model(img_emb)
     text_emb = model.get_learned_conditioning(prompts)
     cond = {"c_crossattn": [torch.cat([text_emb, img_emb], dim=1)]}
-    # concat cond imgs
+    # concat condition imgs
     if model.model.conditioning_key == 'hybrid':
         z = get_latent_z(model, images) # b c t h w
         if loop or gfi:
