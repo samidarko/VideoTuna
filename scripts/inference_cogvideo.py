@@ -126,7 +126,7 @@ def load_inputs_i2v(input_dir, video_size=(480,720), video_frames=49):
     n_samples = len(prompt_list)
     
     ## load images
-    img_paths = get_target_filelist(input_dir, ext='png, jpg, webp, jpeg')
+    img_paths = get_target_filelist(input_dir, ext='png,jpg,webp,jpeg')
     print(f"Found {n_samples} prompts and {len(img_paths)} images in {input_dir}")
     # image transforms
     transform = transforms.Compose([

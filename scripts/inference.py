@@ -19,7 +19,7 @@ from src.utils.common_utils import instantiate_from_config
 from src.base.ddim_multiplecond import DDIMSampler as DDIMSampler_multicond
 from src.utils.inference_utils import (
     load_model_checkpoint, 
-    load_prompts, 
+    load_prompts_from_txt, 
     load_inputs_i2v, 
     load_image_batch, 
     sample_batch_t2v, 
@@ -41,7 +41,7 @@ def get_parser():
     #
     parser.add_argument("--seed", type=int, default=123, help="random seed")
     #
-    parser.add_argument("--height", type=int, default=512, help="video height, in pixel space")
+    parser.add_argument("--height", type=int, default=320, help="video height, in pixel space")
     parser.add_argument("--width", type=int, default=512, help="video width, in pixel space")
     parser.add_argument("--frames", type=int, default=None, help="video frame number, in pixel space")
     parser.add_argument("--fps", type=int, default=24, help="video motion speed. 512 or 1024 model: large value -> slow motion; 256 model: large value -> large motion;")
@@ -81,7 +81,7 @@ def load_model(args, cuda_idx=0):
     assert os.path.exists(args.ckpt_path), f"Error: checkpoint [{args.ckpt_path}] Not Found!"
     model = load_model_checkpoint(model, args.ckpt_path)
     # load lora weights 
-    if len(model.lora_args)!=0:
+    if hasattr(model,"lora_args") and len(model.lora_args)!=0:
         model.inject_lora()
     
     model.eval()
@@ -98,7 +98,7 @@ def load_inputs(args):
     if args.prompt_file is not None:
         assert(os.path.exists(args.prompt_file))
         # load inputs for t2v
-        prompt_list = load_prompts(args.prompt_file)
+        prompt_list = load_prompts_from_txt(args.prompt_file)
         num_prompts = len(prompt_list)
         filename_list = [f"prompt-{idx+1:04d}" for idx in range(num_prompts)]
         image_list = None

@@ -77,7 +77,7 @@ def generate_video(
             # model_input is a directory for i2v
             prompt_file = get_target_filelist(model_input, ext='txt')[0]
             prompts = load_prompts_from_txt(prompt_file=prompt_file)
-            images = get_target_filelist(model_input, ext='png, jpg, webp, jpeg')
+            images = get_target_filelist(model_input, ext='png,jpg,webp,jpeg')
             image_or_video_paths = images
         elif generate_type == "v2v":
             # model_input is a directory for v2v

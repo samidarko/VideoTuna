@@ -12,7 +12,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
-from utils.load_weights import load_safetensors
+from src.utils.load_weights import load_safetensors
 
 def get_target_filelist(data_dir, ext):
     """
@@ -84,7 +84,7 @@ def load_inputs_i2v(input_dir, video_size=(256,256), video_frames=16):
     n_samples = len(prompt_list)
     
     ## load images
-    img_paths = get_target_filelist(input_dir, ext='png, jpg, webp, jpeg')
+    img_paths = get_target_filelist(input_dir, ext='png,jpg,webp,jpeg')
 
     # image transforms
     transform = transforms.Compose([
