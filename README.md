@@ -421,6 +421,27 @@ We support open-sora finetuning, you can simply run the following commands:
 bash shscripts/train_opensorav10.sh
 ```
 
+#### 4. FLUX Lora Fine-tuning
+We support flux lora finetuning, you can simply run the following commands:
+``` shell
+# finetune the Flux-Lora
+bash shscripts/train_flux.sh
+
+# inference the lora model
+bash shscripts/inference_flux_lora.sh
+```
+If you want to build your own dataset, please organize your data as `inputs/t2i/flux/plushie_teddybear`, which contains the training images and the corresponding text prompt files, as shown in the following directory structure. Then modify the `instance_data_dir` in`configs/006_flux/multidatabackend.json`.
+```
+owndata/
+    ├── img1.jpg
+    ├── img2.jpg  
+    ├── img3.jpg           
+    ├── ...
+    ├── prompt1.txt      # prompt of img1.jpg
+    ├── prompt2.txt      # prompt of img2.jpg
+    ├── prompt3.txt      # prompt of img3.jpg
+    ├── ...
+``` 
 
 <!-- Please check [configs/train/003_vc2_lora_ft/README.md](configs/train/003_vc2_lora_ft/README.md) for details.    -->
 <!-- 
