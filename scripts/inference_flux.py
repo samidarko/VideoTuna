@@ -2,7 +2,7 @@ import os
 import torch
 from diffusers import FluxPipeline
 import argparse
-from src.utils.inference_utils import load_prompts_from_txt
+from videotuna.utils.inference_utils import load_prompts_from_txt
 
 def inference(args):
     if args.model_type=='dev':

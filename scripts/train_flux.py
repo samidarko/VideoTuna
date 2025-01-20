@@ -7,15 +7,15 @@ import json
 import time
 from pathlib import Path
 
-from src.third_party.flux.training.state_tracker import StateTracker
-from src.third_party.flux import log_format
+from videotuna.third_party.flux.training.state_tracker import StateTracker
+from videotuna.third_party.flux import log_format
 import logging
 from os import environ
 
 from pytorch_lightning import Trainer
 
-from src.third_party.flux.training.model import Model
-from src.third_party.flux.training.model_data import ModelData
+from videotuna.third_party.flux.training.model import Model
+from videotuna.third_party.flux.training.model_data import ModelData
 import torch.distributed as dist
 
 

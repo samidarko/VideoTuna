@@ -33,7 +33,7 @@ from diffusers import (
 )
 sys.path.insert(0, os.getcwd())
 from diffusers.utils import export_to_video, load_image, load_video
-from src.utils.inference_utils import get_target_filelist, load_prompts_from_txt
+from videotuna.utils.inference_utils import get_target_filelist, load_prompts_from_txt
 
 def generate_video(
     model_input: str,

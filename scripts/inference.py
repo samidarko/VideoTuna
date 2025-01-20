@@ -14,10 +14,10 @@ from pytorch_lightning import seed_everything
 
 sys.path.insert(0, os.getcwd())
 sys.path.insert(1, f'{os.getcwd()}/src')
-from src.base.ddim import DDIMSampler
-from src.utils.common_utils import instantiate_from_config
-from src.base.ddim_multiplecond import DDIMSampler as DDIMSampler_multicond
-from src.utils.inference_utils import (
+from videotuna.base.ddim import DDIMSampler
+from videotuna.utils.common_utils import instantiate_from_config
+from videotuna.base.ddim_multiplecond import DDIMSampler as DDIMSampler_multicond
+from videotuna.utils.inference_utils import (
     load_model_checkpoint, 
     load_prompts_from_txt, 
     load_inputs_i2v, 
