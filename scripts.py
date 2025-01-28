@@ -8,6 +8,21 @@ from datetime import datetime
 
 current_time = datetime.now().strftime("%Y%m%d%H%M%S")
 
+def install_flash_attn():
+    command_install_cuda_nvcc = [
+        "conda", "install", 
+        "-c", "nvidia", "cuda-nvcc",
+        "-y"
+    ] + sys.argv[1:]
+    command_install_flash_attn =[
+        "pip", "install", "flash-attn==2.7.3", "--no-build-isolation"
+    ]
+    result_nvcc = subprocess.run(command_install_cuda_nvcc, check=False)
+    if result_nvcc.returncode != 0:
+        exit(result_nvcc.returncode)
+
+    result_flash = subprocess.run(command_install_flash_attn, check=False)
+    exit(result_flash.returncode)
 
 def code_format(check=False):
     """
@@ -86,7 +101,7 @@ def inference_cogvideo_i2v_diffusers():
         "--guidance_scale", "3.5",
         "--num_videos_per_prompt", "1",
         "--dtype", "float16"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -110,7 +125,7 @@ def inference_cogvideo_i2v_lora():
         "--fps", "16",
         "--seed", "6666",
         "--mode", "i2v"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -130,7 +145,7 @@ def inference_cogvideo_lora():
         "--width", "720",
         "--fps", "16",
         "--seed", "6666"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -144,7 +159,7 @@ def inference_cogvideo_t2v_diffusers():
         "--guidance_scale", "3.5",
         "--num_videos_per_prompt", "1",
         "--dtype", "float16"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -164,7 +179,7 @@ def inference_cogvideox1_5_5b_i2v():
         "--mode_type", "i2v",
         "--sampling_num_frames", "22",
         "--image_folder", image_folder
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -182,7 +197,7 @@ def inference_cogvideox1_5_5b_t2v():
         "--base", base,
         "--mode_type", "t2v",
         "--sampling_num_frames", "22"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -204,29 +219,16 @@ def inference_dc_i2v_576x1024():
         "--width", "1024",
         "--fps", "10",
         "--seed", "123"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
-def inference_flux():
+def inference_flux_schnell():
     # Common parameters
     prompt = "inputs/t2v/prompts.txt"
     width = 1360
     height = 768
 
-    # First inference with "dev" model
-    command_dev = [
-        "python", "scripts/inference_flux.py",
-        "--model_type", "dev",
-        "--prompt", prompt,
-        "--out_path", "results/flux-dev/",
-        "--width", str(width),
-        "--height", str(height),
-        "--num_inference_steps", "50",
-        "--guidance_scale", "0."
-    ]
-
-    # Second inference with "schnell" model
     command_schnell = [
         "python", "scripts/inference_flux.py",
         "--model_type", "schnell",
@@ -236,17 +238,30 @@ def inference_flux():
         "--height", str(height),
         "--num_inference_steps", "4",
         "--guidance_scale", "0."
-    ]
+    ] + sys.argv[1:]
 
-    # Run the first command
-    result_dev = subprocess.run(command_dev, check=False)
-    if result_dev.returncode != 0:
-        exit(result_dev.returncode)
-
-    # Run the second command
     result_schnell = subprocess.run(command_schnell, check=False)
     exit(result_schnell.returncode)
 
+def inference_flux_dev():
+    # Common parameters
+    prompt = "inputs/t2v/prompts.txt"
+    width = 1360
+    height = 768
+    
+    command_dev = [
+        "python", "scripts/inference_flux.py",
+        "--model_type", "dev",
+        "--prompt", prompt,
+        "--out_path", "results/flux-dev/",
+        "--width", str(width),
+        "--height", str(height),
+        "--num_inference_steps", "50",
+        "--guidance_scale", "0."
+    ] + sys.argv[1:]
+
+    result_dev = subprocess.run(command_dev, check=False)
+    exit(result_dev.returncode)
 
 def inference_flux_lora():
     os.environ["lora_ckpt"] = "{YOUR_CORA_CKPT_PATH}"
@@ -260,13 +275,13 @@ def inference_flux_lora():
         "--height", "768",
         "--num_inference_steps", "50",
         "--guidance_scale", "3.5"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
-def inference_hunyuan_diffusers():
+def inference_hunyuan():
     result = subprocess.run([
-        "python", "scripts/inference_hunyuan_diffusers.py",
+        "python", "scripts/inference_hunyuan.py",
         "--video-size", "544", "960",
         "--video-length", "129",
         "--infer-steps", "50",
@@ -278,7 +293,7 @@ def inference_hunyuan_diffusers():
         "--dit-weight",
         "./checkpoints/hunyuan/hunyuan-video-t2v-720p/transformers/mp_rank_00_model_states.pt",
         "--seed", "43"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -298,7 +313,7 @@ def inference_mochi():
         "--width", str(width),
         "--fps", "28",
         "--seed", "124"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -324,7 +339,7 @@ def inference_opensora_v10_16x256x256():
         "--prompt_file", prompt_file,
         "--fps", "8",
         "--frames", "16"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -335,7 +350,7 @@ def inference_v2v_ms():
         "python3", "scripts/inference_v2v_ms.py",
         "--input_dir", input_dir,
         "--output_dir", output_dir
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -356,7 +371,7 @@ def inference_vc1_i2v_320x512():
         "--width", "512",
         "--fps", "8",
         "--seed", "123"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -376,7 +391,7 @@ def inference_vc1_t2v_576x1024():
         "--width", "1024",
         "--fps", "28",
         "--seed", "123"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -386,7 +401,7 @@ def inference_vc2_t2v_320x512():
     config = "configs/001_videocrafter2/vc2_t2v_320x512.yaml"
     prompt_file = "inputs/t2v/prompts.txt"
     savedir = f"results/t2v/{current_time}-videocrafter2"
-    result = subprocess.run([
+    result = subprocess.run([   
         "python3", "scripts/inference.py",
         "--ckpt_path", ckpt,
         "--config", config,
@@ -397,7 +412,7 @@ def inference_vc2_t2v_320x512():
         "--width", "512",
         "--fps", "28",
         "--seed", "123"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -425,7 +440,7 @@ def inference_vc2_t2v_320x512_lora():
         "--ddim_eta", "1.0",
         "--prompt_file", prompt_file,
         "--fps", "28"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -449,7 +464,7 @@ def train_cogvideox_i2v_lora():
         "--devices", "0,",
         "lightning.trainer.num_nodes=1",
         "--auto_resume"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -472,7 +487,7 @@ def train_cogvideox_t2v_lora():
         "--devices", "0,",
         "lightning.trainer.num_nodes=1",
         "--auto_resume"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -496,7 +511,7 @@ def train_dynamicrafter():
         "--devices", "0,",
         "lightning.trainer.num_nodes=1",
         "--auto_resume"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -514,7 +529,7 @@ def train_flux():
         "--config_path", f"{os.environ['CONFIG_PATH']}.{os.environ['CONFIG_BACKEND']}",
         "--data_config_path",
         f"{os.environ['DATACONFIG_PATH']}.{os.environ['CONFIG_BACKEND']}",
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -532,7 +547,7 @@ def train_opensorav10():
         "--name", f"{current_time}_{expname}",
         "--logdir", logdir,
         "--auto_resume"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -559,7 +574,7 @@ def train_videocrafter_lora():
         "--devices", "0,",
         "lightning.trainer.num_nodes=1",
         "--auto_resume"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
 
 
@@ -586,5 +601,5 @@ def train_videocrafter_v2():
         "--devices", "0,",
         "lightning.trainer.num_nodes=1",
         "--auto_resume"
-    ], check=False)
+    ] + sys.argv[1:], check=False)
     exit(result.returncode)
