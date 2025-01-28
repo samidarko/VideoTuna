@@ -10,11 +10,11 @@ from pytorch_lightning.cli import LightningCLI
 
 # sys.path.insert(1, os.path.join(sys.path[0], '..'))
 sys.path.insert(0, os.getcwd())
-from src.utils.common_utils import instantiate_from_config
-from src.utils.lightning_utils import add_trainer_args_to_parser
-from src.utils.train_utils import get_trainer_callbacks, get_trainer_logger, get_trainer_strategy
-from src.utils.train_utils import check_config_attribute, get_empty_params_comparedwith_sd
-from src.utils.train_utils import set_logger, init_workspace, load_checkpoints, get_autoresume_path
+from videotuna.utils.common_utils import instantiate_from_config
+from videotuna.utils.lightning_utils import add_trainer_args_to_parser
+from videotuna.utils.train_utils import get_trainer_callbacks, get_trainer_logger, get_trainer_strategy
+from videotuna.utils.train_utils import check_config_attribute, get_empty_params_comparedwith_sd
+from videotuna.utils.train_utils import set_logger, init_workspace, load_checkpoints, get_autoresume_path
 
 def get_parser(**parser_kwargs):
     parser = argparse.ArgumentParser(**parser_kwargs)

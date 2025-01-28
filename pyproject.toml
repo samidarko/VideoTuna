@@ -1,0 +1,110 @@
+[tool.poetry]
+name = "videotuna"
+version = "0.1.0"
+description = "Videotuna is a useful codebase for text-to-video applications"
+authors = ["Yingqing He <yhebm@connect.ust.hk>", "Yazhou Xing <yxingag@connect.ust.hk>"]
+readme = "README.md"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+deepspeed = "0.15.4"
+av = "12.3.0"
+beautifulsoup4 = "4.12.3"
+colossalai = "0.4.0"
+decord = "0.6.0"
+einops = "0.8.0"
+fire = "0.6.0"
+torch = "2.2.2"
+ftfy = "6.2.3"
+huggingface-hub = "0.24.6"
+loguru = "0.7.2"
+imwatermark = "0.0.2"
+kornia = "0.7.3"
+mmengine = "0.10.4"
+omegaconf = "2.3.0"
+opencv-python = "4.10.0.84"
+packaging = "24.1"
+pandas = "2.2.2"
+pillow = "10.4.0"
+pudb = "2024.1.2"
+pytorch-lightning = "2.4.0"
+pyyaml = "6.0.2"
+rotary-embedding-torch = "0.6.5"
+requests = "2.32.3"
+safetensors = "0.4.4"
+timm = "1.0.8"
+torchvision = "0.17.2"
+tqdm = "4.66.5"
+transformers = "4.39.3"
+xformers = "0.0.25.post1"
+imageio = "2.35.1"
+imageio-ffmpeg = "0.5.1"
+pyramid = "1.5"
+wandb = "0.17.8"
+scipy = "1.14.1"
+beartype = "0.18.5"
+moviepy = "1.0.2"
+open-clip-torch = "2.12.0"
+numpy = "==1.*"
+
+[tool.poetry.dev-dependencies]
+black = "^24.0.0"
+isort = "^5.12.0"
+mypy = "^1.11.2"
+pytest = "^8.3.3"
+pre-commit = "^4.0.0"
+coverage = "^7.6.1"
+ruff = "^0.6.8"
+
+[tool.poetry.scripts]
+coverage-report = 'scripts:coverage_report'
+format = 'scripts:code_format'
+format-check = 'scripts:code_format_check'
+lint = 'scripts:lint'
+test = 'scripts:test'
+type-check = 'scripts:type_check'
+inference-cogvideo-i2v-diffusers = 'scripts:inference_cogVideo_i2v_diffusers'
+inference-cogvideo-i2v-lora = 'scripts:inference_cogvideo_i2v_lora'
+inference-cogvideo-lora = 'scripts:inference_cogvideo_lora'
+inference-cogvideo-t2v-diffusers = 'scripts:inference_cogVideo_t2v_diffusers'
+inference-cogvideox-15-5b-i2v = 'scripts:inference_cogvideox1_5_5b_i2v'
+inference-cogvideox-15-5b-t2v = 'scripts:inference_cogvideox1_5_5b_t2v'
+inference-dc-i2v-576x1024 = 'scripts:inference_dc_i2v_576x1024'
+inference-flux = 'scripts:inference_flux'
+inference-flux-lora = 'scripts:inference_flux_lora'
+inference-hunyuan-diffusers = 'scripts:inference_hunyuan_diffusers'
+inference-mochi = 'scripts:inference_mochi'
+inference-opensora-v10-16x256x256 = 'scripts:inference_opensora_v10_16x256x256'
+inference-v2v-ms = 'scripts:inference_v2v_ms'
+inference-vc1-i2v-320x512 = 'scripts:inference_vc1_i2v_320x512'
+inference-vc1-t2v-576x1024 = 'scripts:inference_vc1_t2v_576x1024'
+inference-vc2-t2v-320x512 = 'scripts:inference_vc2_t2v_320x512'
+inference-vc2-t2v-320x512-lora = 'scripts:inference_vc2_t2v_320x512_lora'
+train-cogvideox-i2v-lora = 'scripts:train_cogvideox_i2v_lora'
+train-cogvideox-t2v-lora = 'scripts:train_cogvideox_t2v_lora'
+train-dynamicrafter = 'scripts:train_dynamicrafter'
+train-flux = 'scripts:train_flux'
+train-opensorav10 = 'scripts:train_opensorav10'
+train-videocrafter-lora = 'scripts:train_videocrafter_lora'
+train-videocrafter-v2 = 'scripts:train_videocrafter_v2'
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+
+[[tool.mypy.overrides]]
+module = [
+]
+ignore_missing_imports = true
+
+[tool.ruff]
+select = ["E", "F", "C90"]
+ignore = []

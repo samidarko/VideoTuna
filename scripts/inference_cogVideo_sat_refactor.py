@@ -21,7 +21,7 @@ from sat.arguments import add_training_args, add_evaluation_args, add_data_args
 from sat.arguments import set_random_seed
 
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), "../src/cogvideo_sat"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "../videotuna/cogvideo_sat"))
 # from cogvideo_sat import diffusion_video
 from diffusion_video import SATVideoDiffusionEngine
 

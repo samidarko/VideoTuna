@@ -15,8 +15,8 @@ import torchvision.transforms as transforms
 
 sys.path.insert(0, os.getcwd())
 sys.path.insert(1, f'{os.getcwd()}/src')
-from src.utils.common_utils import instantiate_from_config
-from src.utils.inference_utils import (
+from videotuna.utils.common_utils import instantiate_from_config
+from videotuna.utils.inference_utils import (
     get_target_filelist,
     load_model_checkpoint, 
     load_prompts_from_txt, 

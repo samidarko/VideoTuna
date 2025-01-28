@@ -7,9 +7,9 @@ from datetime import datetime
 
 sys.path.insert(0, os.getcwd())
 sys.path.insert(1, f'{os.getcwd()}/src')
-from src.hyvideo.utils.file_utils import save_videos_grid
-from src.hyvideo.config import parse_args
-from src.hyvideo.inference import HunyuanVideoSampler
+from videotuna.hyvideo.utils.file_utils import save_videos_grid
+from videotuna.hyvideo.config import parse_args
+from videotuna.hyvideo.inference import HunyuanVideoSampler
 
 
 def main():

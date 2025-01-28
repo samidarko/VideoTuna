@@ -1,6 +1,6 @@
 model:
   base_learning_rate: 6e-6
-  target: src.cogvideo_hf.cogvideo_i2v.CogVideoXI2V
+  target: videotuna.cogvideo_hf.cogvideo_i2v.CogVideoXI2V
   params: 
     noised_image_input: True
     noised_image_dropout: 0.05
@@ -13,7 +13,7 @@ model:
     
     # Text encoder (T5) of CogVideoX
     cond_stage_config:
-      target: src.lvdm.modules.encoders.condition.FrozenT5Embedder
+      target: videotuna.lvdm.modules.encoders.condition.FrozenT5Embedder
       params:
         version: "DeepFloyd/t5-v1_1-xxl"
         device: "cuda"
@@ -48,13 +48,13 @@ model:
 
 # data configs
 # data:
-#   target: src.data.lightning_data.DataModuleFromConfig
+#   target: videotuna.data.lightning_data.DataModuleFromConfig
 #   params:
 #     batch_size: 2
 #     num_workers: 16
 #     wrap: false
 #     train:
-#       target: src.data.cogvideo_dataset.VideoDataset
+#       target: videotuna.data.cogvideo_dataset.VideoDataset
 #       params:
 #         instance_data_root: inputs/data-cartoon-talk #"inputs/t2v/cogvideo/elon_musk_video"
 #         dataset_name: null 
@@ -71,13 +71,13 @@ model:
 #         id_token: null
 #         image_to_video: true
 data:
-  target: src.data.lightning_data.DataModuleFromConfig
+  target: videotuna.data.lightning_data.DataModuleFromConfig
   params:
     batch_size: 1
     num_workers: 16
     wrap: false
     train:
-      target: src.data.datasets.DatasetFromCSV
+      target: videotuna.data.datasets.DatasetFromCSV
       params:
         csv_path: temp/apply_lipstick.csv
         height: 480
@@ -87,7 +87,7 @@ data:
         train: True
         image_to_video: true
     validation:
-      target: src.data.datasets.DatasetFromCSV
+      target: videotuna.data.datasets.DatasetFromCSV
       params:
         csv_path: temp/apply_lipstick.csv
         height: 480
@@ -107,7 +107,7 @@ lightning:
     precision: 32
   callbacks:
     image_logger:
-      target: src.utils.callbacks.ImageLogger
+      target: videotuna.utils.callbacks.ImageLogger
       params:
         batch_frequency: 100000
         max_images: 2
