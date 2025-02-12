@@ -73,6 +73,11 @@ pre-commit = "^4.0.0"
 coverage = "^7.6.1"
 ruff = "^0.6.8"
 
+[[tool.poetry.source]]
+name = "modelscope"
+url = "https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html"
+priority = "supplemental"
+
 [tool.poetry.scripts]
 install-flash-attn = 'scripts:install_flash_attn'
 coverage-report = 'scripts:coverage_report'
