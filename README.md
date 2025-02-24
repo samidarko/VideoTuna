@@ -251,17 +251,42 @@ Please check [docs/CHECKPOINTS.md](docs/CHECKPOINTS.md) to download all the mode
 
 ### 1.Prepare environment
 
-Install Poetry: https://python-poetry.org/docs/#installation
+#### (1) If you use Linux and conda
+``` shell
+conda create -n videotuna python=3.10 -y
+conda activate videotuna
+pip install poetry
+poetry install
+poetry run pip install "modelscope[cv]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
+```
+**Flash-attn installation (Optional)**
 
-On Linux only
+Hunyuan model uses it to reduce memory usage and speed up inference. If it is not installed, the model will run in normal mode. Install the `flash-attn` via:
+``` shell
+poetry run install-flash-attn 
+```
 
+#### (2) If you use Linux and Poetry (without conda):
+
+Install Poetry: https://python-poetry.org/docs/#installation  
+Then: 
 ``` shell
 poetry config virtualenvs.in-project true # optional but recommended, will ensure the virtual env is created in the project root
+poetry config virtualenvs.create true # enable this argument to ensure the virtual env is created in the project root
 poetry env use python3.10 # will create the virtual env, check with `ls -l .venv`.
 poetry env activate # optional because Poetry commands (e.g. `poetry install` or `poetry run <command>`) will always automatically load the virtual env.
 poetry install
+poetry run pip install "modelscope[cv]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
 ```
 
+**Flash-attn installation (Optional)**
+
+Hunyuan model uses it to reduce memory usage and speed up inference. If it is not installed, the model will run in normal mode. Install the `flash-attn` via:
+``` shell
+poetry run install-flash-attn 
+```
+
+#### (3) If you use MacOS
 On MacOS with Apple Silicon chip use [docker compose](https://docs.docker.com/compose/) because some dependencies are not supporting arm64 (e.g. `bitsandbytes`, `decord`, `xformers`).
 
 First build:
@@ -312,12 +337,6 @@ Start a terminal:
 docker compose run -it --remove-orphans videotuna bash
 ```
 
-**Flash-attn installation (Optional)**
-
-Hunyuan model uses it to reduce memory usage and speed up inference. If it is not installed, the model will run in normal mode.
-``` shell
-poetry run install-flash-attn 
-```
 ### 2.Prepare checkpoints
 
 Please follow [docs/CHECKPOINTS.md](https://github.com/VideoVerses/VideoTuna/blob/main/docs/CHECKPOINTS.md) to download model checkpoints.  
